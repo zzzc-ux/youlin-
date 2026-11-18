@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#334155"/><stop offset=".38" stop-color="#6d28d9"/>
+      <stop offset=".72" stop-color="#0f766e"/><stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <marker id="s1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+    </marker>
+    <marker id="s2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b8b99"/>
+    </marker>
+    <style>
+      .m{font-family:Consolas,monospace}
+      .kicker{font-family:"Microsoft YaHei",sans-serif;font-size:17px;font-weight:500;fill:#8a8a97;letter-spacing:4px}
+      .h1{font-family:"Microsoft YaHei",sans-serif;font-size:54px;font-weight:700;fill:#131317;letter-spacing:-1px}
+      .sub{font-family:Consolas,monospace;font-size:19px;fill:#8a8a97}
+      .st{font-family:Consolas,monospace;font-size:24px;font-weight:700}
+      .stl{font-family:Consolas,monospace;font-size:15px}
+      .lab{font-family:"Microsoft YaHei",sans-serif;font-size:16px;fill:#71717f}
+      .ch{font-family:"Microsoft YaHei",sans-serif;font-size:19px;font-weight:700;fill:#131317}
+      .cp{font-family:"Microsoft YaHei",sans-serif;font-size:15px;fill:#71717f}
+      .foot{font-family:Consolas,monospace;font-size:16px;fill:#9a9aa8}
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="url(#top)"/>
+
+  <text class="kicker" x="96" y="96">HITL · CAMPUSPENDING STATE MACHINE</text>
+  <text class="h1" x="96" y="158">确认闸门：唯一合法推进边</text>
+  <text class="sub" x="96" y="196">pending → executing 是唯一推进路径 · 其余为终态或死路 · 单表 + 部分唯一索引解决三类并发故障</text>
+
+  <!-- initial -->
+  <circle cx="150" cy="500" r="7" fill="#131317"/>
+  <line x1="157" y1="500" x2="222" y2="500" stroke="#8b8b99" stroke-width="1.6" marker-end="url(#s2)"/>
+  <text class="lab" x="160" y="484">savePlan()</text>
+
+  <!-- pending -->
+  <rect x="230" y="440" width="330" height="120" rx="12" fill="#fff8ea" stroke="#f4dcae" stroke-width="2"/>
+  <text class="st" x="395" y="490" text-anchor="middle" fill="#7c3f06">pending</text>
+  <text class="stl" x="395" y="520" text-anchor="middle" fill="#a17a3d">唯一索引锁 · TTL 30min</text>
+
+  <!-- cancelled -->
+  <rect x="730" y="230" width="330" height="110" rx="12" fill="#ffffff" stroke="#d5dce6"/>
+  <text class="st" x="895" y="278" text-anchor="middle" fill="#131317">cancelled</text>
+  <text class="stl" x="895" y="306" text-anchor="middle" fill="#8a8a97">用户拒绝</text>
+
+  <!-- executing -->
+  <rect x="730" y="440" width="330" height="120" rx="12" fill="#eefbf8" stroke="#bfe9e2" stroke-width="2"/>
+  <text class="st" x="895" y="490" text-anchor="middle" fill="#0b5d56">executing</text>
+  <text class="stl" x="895" y="520" text-anchor="middle" fill="#2b7a71">UPDATE … RETURNING</text>
+
+  <!-- superseded -->
+  <rect x="730" y="650" width="330" height="110" rx="12" fill="#ffffff" stroke="#d5dce6"/>
+  <text class="st" x="895" y="698" text-anchor="middle" fill="#131317">superseded</text>
+  <text class="stl" x="895" y="726" text-anchor="middle" fill="#8a8a97">新消息覆盖</text>
+
+  <!-- done -->
+  <rect x="1230" y="440" width="330" height="120" rx="12" fill="#eefbf8" stroke="#bfe9e2" stroke-width="2"/>
+  <text class="st" x="1395" y="490" text-anchor="middle" fill="#0b5d56">done</text>
+  <text class="stl" x="1395" y="520" text-anchor="middle" fill="#2b7a71">副作用已生效 · 终态</text>
+
+  <!-- failed -->
+  <rect x="1230" y="650" width="330" height="110" rx="12" fill="#ffffff" stroke="#f0c9c9"/>
+  <text class="st" x="1395" y="698" text-anchor="middle" fill="#8f1d1d">failed</text>
+  <text class="stl" x="1395" y="726" text-anchor="middle" fill="#a15a5a">execute 抛错 · 死路</text>
+
+  <!-- arrows -->
+  <line x1="560" y1="462" x2="722" y2="300" stroke="#8b8b99" stroke-width="1.6" marker-end="url(#s2)"/>
+  <text class="lab" x="600" y="366">取消</text>
+
+  <line x1="560" y1="500" x2="722" y2="500" stroke="#0f766e" stroke-width="2.2" marker-end="url(#s1)"/>
+  <text class="lab" x="580" y="486" fill="#0b5d56" font-weight="700">确认 · 原子抢占</text>
+
+  <line x1="560" y1="538" x2="722" y2="700" stroke="#8b8b99" stroke-width="1.6" marker-end="url(#s2)"/>
+  <text class="lab" x="576" y="648">下一条 message</text>
+
+  <line x1="1060" y1="500" x2="1222" y2="500" stroke="#0f766e" stroke-width="2.2" marker-end="url(#s1)"/>
+
+  <line x1="1060" y1="538" x2="1222" y2="700" stroke="#8b8b99" stroke-width="1.6" marker-end="url(#s2)"/>
+  <text class="lab" x="1090" y="648">catch</text>
+
+  <!-- bottom cards -->
+  <g>
+    <rect x="96" y="840" width="556" height="130" rx="12" fill="#f7f9fb" stroke="#dde3ea"/>
+    <text class="ch" x="122" y="878">并发：为什么必须是单条 UPDATE</text>
+    <text class="cp" x="122" y="910">「先查再改」在双标签页同时确认时会双重执行；</text>
+    <text class="cp" x="122" y="936">RETURNING 单语句抢占，第二个请求命中 0 行。</text>
+
+    <rect x="682" y="840" width="556" height="130" rx="12" fill="#f7f9fb" stroke="#dde3ea"/>
+    <text class="ch" x="708" y="878">陈旧：为什么要 superseded</text>
+    <text class="cp" x="708" y="910">连发两条不同意图时，旧计划若不撤销，</text>
+    <text class="cp" x="708" y="936">晚到的「确认」会执行与当前语境无关的写操作。</text>
+
+    <rect x="1268" y="840" width="556" height="130" rx="12" fill="#f7f9fb" stroke="#dde3ea"/>
+    <text class="ch" x="1294" y="878">时效：30 分钟 TTL</text>
+    <text class="cp" x="1294" y="910">createdAt &gt; now() - interval '30 minutes'，</text>
+    <text class="cp" x="1294" y="936">避免隔夜误触；每条新消息先 superseded 旧计划。</text>
+  </g>
+
+  <text class="foot" x="96" y="1024">CampusPending · engine.ts:287-425 · CREATE UNIQUE INDEX … WHERE status='pending'</text>
+  <text class="foot" x="1824" y="1024" text-anchor="end">FIG 05 / 06</text>
+</svg>

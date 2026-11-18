@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#334155"/><stop offset=".38" stop-color="#6d28d9"/>
+      <stop offset=".72" stop-color="#0f766e"/><stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <style>
+      .t{font-family:"Microsoft YaHei",sans-serif}
+      .m{font-family:Consolas,monospace}
+      .kicker{font-family:"Microsoft YaHei",sans-serif;font-size:17px;font-weight:500;fill:#8a8a97;letter-spacing:4px}
+      .h1{font-family:"Microsoft YaHei",sans-serif;font-size:54px;font-weight:700;fill:#131317;letter-spacing:-1px}
+      .sub{font-family:Consolas,monospace;font-size:19px;fill:#8a8a97}
+      .qh{font-family:Consolas,monospace;font-size:22px;font-weight:700}
+      .qs{font-family:Consolas,monospace;font-size:16px;fill:#9a9aa8}
+      .chip{font-family:Consolas,monospace;font-size:21px;fill:#1f2430}
+      .chipd{font-family:Consolas,monospace;font-size:21px;fill:#0b5d56}
+      .chipv{font-family:Consolas,monospace;font-size:21px;fill:#3b1d78}
+      .chipa{font-family:Consolas,monospace;font-size:21px;fill:#6d4a11}
+      .cap{font-family:"Microsoft YaHei",sans-serif;font-size:16px;fill:#9a9aa8}
+      .foot{font-family:Consolas,monospace;font-size:16px;fill:#9a9aa8}
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="url(#top)"/>
+
+  <text class="kicker" x="96" y="96">QUADRANT MATRIX · INVOCATION × KERNEL</text>
+  <text class="h1" x="96" y="158">调用权 × 推理性：19 项正交切分</text>
+  <text class="sub" x="96" y="196">谁发起调用（Y）× 执行体是否含推理（X）· 19 = 5 + 3 + 8 + 3</text>
+
+  <rect x="140" y="240" width="1720" height="680" rx="12" fill="#ffffff" stroke="#e2e2e8"/>
+  <line x1="1000" y1="240" x2="1000" y2="920" stroke="#e2e2e8"/>
+  <line x1="140" y1="580" x2="1860" y2="580" stroke="#e2e2e8"/>
+
+  <text class="qs" x="1000" y="226" text-anchor="middle">X · 执行内核　⟵ 纯 IO / 规则　·　含推理 ⟶</text>
+  <text class="qs" x="104" y="400" text-anchor="middle" transform="rotate(-90 104 400)">调用权 = 模型 · function calling</text>
+  <text class="qs" x="104" y="750" text-anchor="middle" transform="rotate(-90 104 750)">调用权 = 引擎 · code path</text>
+
+  <!-- Q1 top-left -->
+  <rect x="160" y="260" width="820" height="300" rx="10" fill="#f3f5f8" stroke="#d5dce6"/>
+  <text class="qh" x="190" y="302" fill="#334155">Q1 · MODEL-INVOKED / DETERMINISTIC</text>
+  <text class="qs" x="190" y="330">5 项 · 模型选时机，算子只做 IO</text>
+  <rect x="190" y="352" width="380" height="50" rx="8" fill="#ffffff" stroke="#d5dce6"/><text class="chip" x="210" y="384">searchImages</text>
+  <rect x="590" y="352" width="380" height="50" rx="8" fill="#ffffff" stroke="#d5dce6"/><text class="chip" x="610" y="384">grabImage</text>
+  <rect x="190" y="416" width="380" height="50" rx="8" fill="#ffffff" stroke="#d5dce6"/><text class="chip" x="210" y="448">searchNews</text>
+  <rect x="590" y="416" width="380" height="50" rx="8" fill="#ffffff" stroke="#d5dce6"/><text class="chip" x="610" y="448">getWeather</text>
+  <rect x="190" y="480" width="380" height="50" rx="8" fill="#ffffff" stroke="#d5dce6"/><text class="chip" x="210" y="512">editDocument</text>
+  <text class="cap" x="610" y="536">参数由模型生成 · 执行结果确定可复现</text>
+
+  <!-- Q2 top-right -->
+  <rect x="1020" y="260" width="820" height="300" rx="10" fill="#f5f1ff" stroke="#ddd0fb"/>
+  <text class="qh" x="1050" y="302" fill="#4c1d95">Q2 · MODEL-INVOKED / GENERATIVE</text>
+  <text class="qs" x="1050" y="330">3 项 · 工具内部再起一次生成</text>
+  <rect x="1050" y="352" width="380" height="50" rx="8" fill="#ffffff" stroke="#ddd0fb"/><text class="chipv" x="1070" y="384">createDocument</text>
+  <rect x="1450" y="352" width="380" height="50" rx="8" fill="#ffffff" stroke="#ddd0fb"/><text class="chipv" x="1470" y="384">updateDocument</text>
+  <rect x="1050" y="416" width="380" height="50" rx="8" fill="#ffffff" stroke="#ddd0fb"/><text class="chipv" x="1070" y="448">requestSuggestions</text>
+  <text class="cap" x="1050" y="496">父调用未返回，子流已向同一 SSE 写入增量</text>
+  <text class="cap" x="1050" y="522">⟶ 工具即「二次编排器」，最深的一层自引用</text>
+
+  <!-- Q3 bottom-left -->
+  <rect x="160" y="600" width="820" height="300" rx="10" fill="#eefbf8" stroke="#bfe9e2"/>
+  <text class="qh" x="190" y="642" fill="#0b5d56">Q3 · ENGINE-INVOKED / DETERMINISTIC</text>
+  <text class="qs" x="190" y="670">8 项 · 规则抽槽 + 本地/样本状态</text>
+  <rect x="190" y="686" width="380" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/><text class="chipd" x="210" y="715">searchLost</text>
+  <rect x="590" y="686" width="380" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/><text class="chipd" x="610" y="715">searchNotice</text>
+  <rect x="190" y="740" width="380" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/><text class="chipd" x="210" y="769">searchRepair</text>
+  <rect x="590" y="740" width="380" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/><text class="chipd" x="610" y="769">queryAccess</text>
+  <rect x="190" y="794" width="380" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/><text class="chipd" x="210" y="823">campusCard</text>
+  <rect x="590" y="794" width="380" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/><text class="chipd" x="610" y="823">registerLost</text>
+  <rect x="190" y="848" width="380" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/><text class="chipd" x="210" y="877">closeLost</text>
+  <rect x="590" y="848" width="380" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/><text class="chipd" x="610" y="877">createRepair</text>
+
+  <!-- Q4 bottom-right -->
+  <rect x="1020" y="600" width="820" height="300" rx="10" fill="#fff8ea" stroke="#f4dcae"/>
+  <text class="qh" x="1050" y="642" fill="#7c3f06">Q4 · ENGINE-INVOKED / INFERENCE</text>
+  <text class="qs" x="1050" y="670">3 项 · 模型只是「算子」，不做「决策」</text>
+  <rect x="1050" y="692" width="380" height="50" rx="8" fill="#ffffff" stroke="#f4dcae"/><text class="chipa" x="1070" y="724">searchForum</text>
+  <rect x="1450" y="692" width="380" height="50" rx="8" fill="#ffffff" stroke="#f4dcae"/><text class="chipa" x="1470" y="724">publishForum</text>
+  <rect x="1050" y="756" width="380" height="50" rx="8" fill="#ffffff" stroke="#f4dcae"/><text class="chipa" x="1070" y="788">searchCampus</text>
+  <text class="cap" x="1050" y="836">语义重排 / 结构化草稿 / 向量召回，全部包在 try 里</text>
+  <text class="cap" x="1050" y="862">失败静默降级为关键词或正则，调用权始终在引擎</text>
+  <text class="cap" x="1050" y="888">⟶ 模型被「降格」为算子，失去 self-dispatch 能力</text>
+
+  <text class="foot" x="96" y="1006">■ 紫底 = 生成式内核　■ 橙底 = 语义/表征内核　■ 灰/青底 = 确定性内核　·　来源 engine.ts · forum-match.ts · forum-draft.ts · rag/search.ts</text>
+  <text class="foot" x="1824" y="1006" text-anchor="end">FIG 02 / 06</text>
+</svg>

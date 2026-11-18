@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#334155"/><stop offset=".38" stop-color="#6d28d9"/>
+      <stop offset=".72" stop-color="#0f766e"/><stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b8b99"/>
+    </marker>
+    <marker id="av" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6d28d9"/>
+    </marker>
+    <marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+    </marker>
+    <style>
+      .t{font-family:"Microsoft YaHei","PingFang SC",sans-serif}
+      .m{font-family:Consolas,"Courier New",monospace}
+      .kicker{font-family:"Microsoft YaHei",sans-serif;font-size:17px;font-weight:500;fill:#8a8a97;letter-spacing:4px}
+      .h1{font-family:"Microsoft YaHei",sans-serif;font-size:54px;font-weight:700;fill:#131317;letter-spacing:-1px}
+      .sub{font-family:Consolas,monospace;font-size:19px;fill:#8a8a97}
+      .chip{font-family:Consolas,monospace;font-size:21px;fill:#1f2430}
+      .chipt{font-family:Consolas,monospace;font-size:21px;fill:#3b1d78}
+      .chipa{font-family:Consolas,monospace;font-size:21px;fill:#6d4a11}
+      .foot{font-family:Consolas,monospace;font-size:16px;fill:#9a9aa8}
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="url(#top)"/>
+
+  <text class="kicker" x="96" y="96">YOULIN CAMPUS · TOOL PLANE ARCHITECTURE</text>
+  <text class="h1" x="96" y="158">工具调用双平面架构</text>
+  <text class="sub" x="96" y="196">Dual-Plane Tool Invocation · 19 capability descriptors · 11 invariants</text>
+
+  <!-- arbitration -->
+  <rect x="96" y="228" width="1728" height="96" rx="12" fill="#fff8ea" stroke="#f4dcae"/>
+  <rect x="96" y="228" width="7" height="96" fill="#b45309"/>
+  <text class="m" x="126" y="262" font-size="24" font-weight="700" fill="#7c3f06">PLANE ARBITRATOR · 单点仲裁</text>
+  <text class="m" x="126" y="300" font-size="18" fill="#8a5a15">canUseModel = (kind ∈ {unknown, qa}) ∧ ¬suppressModel ∧ hasModelProvider()　→　false 走模板 · true 走模型</text>
+  <text class="m" x="1490" y="262" font-size="16" fill="#b08030">恒先执行</text>
+  <text class="m" x="1490" y="288" font-size="16" fill="#b08030">不询问模型</text>
+
+  <!-- PLANE D -->
+  <rect x="96" y="346" width="800" height="452" rx="14" fill="#eefbf8" stroke="#bfe9e2"/>
+  <text class="m" x="126" y="390" font-size="26" font-weight="700" fill="#0b5d56">PLANE D · 确定性平面</text>
+  <text class="m" x="126" y="420" font-size="17" fill="#2b7a71">11 项 · 不在 tools 描述符中 · 代码路径派发</text>
+
+  <g>
+    <rect x="126" y="442" width="356" height="52" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="chip" x="144" y="475">searchLost</text>
+    <rect x="496" y="442" width="356" height="52" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="chip" x="514" y="475">searchNotice</text>
+
+    <rect x="126" y="502" width="356" height="52" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="chip" x="144" y="535">searchRepair</text>
+    <rect x="496" y="502" width="356" height="52" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="chip" x="514" y="535">queryAccess</text>
+
+    <rect x="126" y="562" width="356" height="52" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="chip" x="144" y="595">campusCard</text>
+    <rect x="496" y="562" width="356" height="52" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="chip" x="514" y="595">registerLost</text>
+
+    <rect x="126" y="622" width="356" height="52" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="chip" x="144" y="655">closeLost</text>
+    <rect x="496" y="622" width="356" height="52" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="chip" x="514" y="655">createRepair</text>
+
+    <rect x="126" y="682" width="356" height="52" rx="8" fill="#fff8ea" stroke="#f4dcae"/>
+    <circle cx="146" cy="708" r="4" fill="#b45309"/>
+    <text class="chipa" x="160" y="715">searchForum</text>
+    <rect x="496" y="682" width="356" height="52" rx="8" fill="#fff8ea" stroke="#f4dcae"/>
+    <circle cx="516" cy="708" r="4" fill="#b45309"/>
+    <text class="chipa" x="530" y="715">publishForum</text>
+
+    <rect x="126" y="742" width="356" height="52" rx="8" fill="#fff8ea" stroke="#f4dcae"/>
+    <circle cx="146" cy="768" r="4" fill="#b45309"/>
+    <text class="chipa" x="160" y="775">searchCampus</text>
+    <text class="m" x="496" y="775" font-size="16" fill="#5eaaa1">● 含推理内核（3）· 失败降级为规则</text>
+  </g>
+
+  <!-- PLANE M -->
+  <rect x="928" y="346" width="896" height="452" rx="14" fill="#f5f1ff" stroke="#ddd0fb"/>
+  <text class="m" x="958" y="390" font-size="26" font-weight="700" fill="#4c1d95">PLANE M · 模型平面</text>
+  <text class="m" x="958" y="420" font-size="17" fill="#6d28d9">8 项 · function calling · 模型持有调用权</text>
+
+  <g>
+    <rect x="958" y="442" width="410" height="52" rx="8" fill="#ffffff" stroke="#ddd0fb"/>
+    <circle cx="978" cy="468" r="4" fill="#6d28d9"/>
+    <text class="chipt" x="992" y="475">createDocument</text>
+    <rect x="1384" y="442" width="410" height="52" rx="8" fill="#ffffff" stroke="#ddd0fb"/>
+    <circle cx="1404" cy="468" r="4" fill="#6d28d9"/>
+    <text class="chipt" x="1418" y="475">updateDocument</text>
+
+    <rect x="958" y="502" width="410" height="52" rx="8" fill="#ffffff" stroke="#ddd0fb"/>
+    <circle cx="978" cy="528" r="4" fill="#6d28d9"/>
+    <text class="chipt" x="992" y="535">requestSuggestions</text>
+    <rect x="1384" y="502" width="410" height="52" rx="8" fill="#ffffff" stroke="#ddd0fb"/>
+    <text class="chip" x="1418" y="535">editDocument</text>
+
+    <rect x="958" y="562" width="410" height="52" rx="8" fill="#ffffff" stroke="#ddd0fb"/>
+    <text class="chip" x="992" y="595">searchImages</text>
+    <rect x="1384" y="562" width="410" height="52" rx="8" fill="#ffffff" stroke="#ddd0fb"/>
+    <text class="chip" x="1418" y="595">grabImage</text>
+
+    <rect x="958" y="622" width="410" height="52" rx="8" fill="#ffffff" stroke="#ddd0fb"/>
+    <text class="chip" x="992" y="655">searchNews</text>
+    <rect x="1384" y="622" width="410" height="52" rx="8" fill="#ffffff" stroke="#ddd0fb"/>
+    <text class="chip" x="1418" y="655">getWeather</text>
+  </g>
+  <text class="m" x="958" y="716" font-size="16" fill="#8b6bd8">● 生成式内核（3）：工具内部再起一次 streamText</text>
+  <text class="m" x="958" y="748" font-size="16" fill="#8b6bd8">其余 5 项为纯 HTTP / 字符串替换，不触模型</text>
+
+  <!-- arrows between panels -->
+  <path d="M900 572 L920 572" stroke="#8b8b99" stroke-width="2" marker-end="url(#a)" stroke-dasharray="6 5"/>
+  <text class="m" x="884" y="556" font-size="15" fill="#a0a0ae" text-anchor="middle">互斥</text>
+
+  <!-- bottom band -->
+  <g class="m">
+    <rect x="96" y="822" width="414" height="112" rx="10" fill="#f7f9fb" stroke="#dde3ea"/>
+    <text x="118" y="856" font-size="19" font-weight="700" fill="#1e293b">L4 · Campus Adapters (11)</text>
+    <text x="118" y="886" font-size="15" fill="#7a8698">forum · lost-found · repairs</text>
+    <text x="118" y="910" font-size="15" fill="#7a8698">notices · card · access · RAG</text>
+
+    <rect x="534" y="822" width="414" height="112" rx="10" fill="#f7f4ff" stroke="#e2d8fb"/>
+    <text x="556" y="856" font-size="19" font-weight="700" fill="#4c1d95">L4 · Document Adapters (3)</text>
+    <text x="556" y="886" font-size="15" fill="#8b7bb5">text · code · sheet</text>
+    <text x="556" y="910" font-size="15" fill="#8b7bb5">每个 handler 内嵌 streamText</text>
+
+    <rect x="972" y="822" width="414" height="112" rx="10" fill="#fff9ef" stroke="#f4dcae"/>
+    <text x="994" y="856" font-size="19" font-weight="700" fill="#7c3f06">L5 · 外部 IO (5)</text>
+    <text x="994" y="886" font-size="15" fill="#a17a3d">wttr.in · people.cn · image index</text>
+    <text x="994" y="910" font-size="15" fill="#a17a3d">DeepSeek chat · embedding</text>
+
+    <rect x="1410" y="822" width="414" height="112" rx="10" fill="#f7f9fb" stroke="#dde3ea"/>
+    <text x="1432" y="856" font-size="19" font-weight="700" fill="#1e293b">L5 · 状态 (2)</text>
+    <text x="1432" y="886" font-size="15" fill="#7a8698">Postgres / PGlite</text>
+    <text x="1432" y="910" font-size="15" fill="#7a8698">Vercel Blob（grabImage 不可逆）</text>
+  </g>
+
+  <text class="foot" x="96" y="1006">19 = 8 + 11　·　6 项含推理内核（3 生成式 / 1 表征式 / 2 语义）　·　13 项纯规则与 IO</text>
+  <text class="foot" x="1824" y="1006" text-anchor="end">FIG 01 / 06</text>
+</svg>

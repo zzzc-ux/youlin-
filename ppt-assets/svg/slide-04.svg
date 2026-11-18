@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#334155"/><stop offset=".38" stop-color="#6d28d9"/>
+      <stop offset=".72" stop-color="#0f766e"/><stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <marker id="d1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+    </marker>
+    <marker id="d2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b8b99"/>
+    </marker>
+    <style>
+      .m{font-family:Consolas,monospace}
+      .kicker{font-family:"Microsoft YaHei",sans-serif;font-size:17px;font-weight:500;fill:#8a8a97;letter-spacing:4px}
+      .h1{font-family:"Microsoft YaHei",sans-serif;font-size:54px;font-weight:700;fill:#131317;letter-spacing:-1px}
+      .sub{font-family:Consolas,monospace;font-size:19px;fill:#8a8a97}
+      .lane{font-family:"Microsoft YaHei",sans-serif;font-size:20px;font-weight:700;fill:#131317}
+      .lanel{font-family:Consolas,monospace;font-size:14px;fill:#8a8a97}
+      .msg{font-family:Consolas,monospace;font-size:17px;fill:#3d3d47}
+      .gate{font-family:"Microsoft YaHei",sans-serif;font-size:16px;font-weight:700;fill:#7c3f06}
+      .foot{font-family:Consolas,monospace;font-size:16px;fill:#9a9aa8}
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="url(#top)"/>
+
+  <text class="kicker" x="96" y="96">PLANE D · DETERMINISTIC DISPATCH</text>
+  <text class="h1" x="96" y="158">Plane D 时序：控制面绕过模型按扳机</text>
+  <text class="sub" x="96" y="196">规则分类 → 指代消解 → 策略注册表 → 悲观确认闸门 → 原子执行（全程无 streamText）</text>
+
+  <g>
+    <rect x="40" y="240" width="260" height="64" rx="9" fill="#f3f5f8" stroke="#d5dce6"/>
+    <text class="lane" x="170" y="268" text-anchor="middle">Client</text>
+    <text class="lanel" x="170" y="292" text-anchor="middle">「确认发布」</text>
+
+    <rect x="350" y="240" width="260" height="64" rx="9" fill="#eefbf8" stroke="#bfe9e2"/>
+    <text class="lane" x="480" y="268" text-anchor="middle" fill="#0b5d56">runCampusEngine</text>
+    <text class="lanel" x="480" y="292" text-anchor="middle">控制面入口</text>
+
+    <rect x="670" y="240" width="260" height="64" rx="9" fill="#eefbf8" stroke="#bfe9e2"/>
+    <text class="lane" x="800" y="268" text-anchor="middle" fill="#0b5d56">Router</text>
+    <text class="lanel" x="800" y="292" text-anchor="middle">classify / route</text>
+
+    <rect x="980" y="240" width="260" height="64" rx="9" fill="#eefbf8" stroke="#bfe9e2"/>
+    <text class="lane" x="1110" y="268" text-anchor="middle" fill="#0b5d56">Policy · IoC</text>
+    <text class="lanel" x="1110" y="292" text-anchor="middle">toolPolicy / executeTool</text>
+
+    <rect x="1290" y="240" width="260" height="64" rx="9" fill="#fff8ea" stroke="#f4dcae"/>
+    <text class="lane" x="1420" y="268" text-anchor="middle" fill="#7c3f06">CampusPending</text>
+    <text class="lanel" x="1420" y="292" text-anchor="middle">确认闸门</text>
+
+    <rect x="1590" y="240" width="290" height="64" rx="9" fill="#eefbf8" stroke="#bfe9e2"/>
+    <text class="lane" x="1735" y="268" text-anchor="middle" fill="#0b5d56">Adapter · DB</text>
+    <text class="lanel" x="1735" y="292" text-anchor="middle">副作用</text>
+  </g>
+
+  <g stroke="#dcdce4" stroke-width="1.5" stroke-dasharray="5 7">
+    <line x1="170" y1="304" x2="170" y2="968"/>
+    <line x1="480" y1="304" x2="480" y2="968"/>
+    <line x1="800" y1="304" x2="800" y2="968"/>
+    <line x1="1110" y1="304" x2="1110" y2="968"/>
+    <line x1="1420" y1="304" x2="1420" y2="968"/>
+    <line x1="1735" y1="304" x2="1735" y2="968"/>
+  </g>
+
+  <g>
+    <line x1="170" y1="354" x2="466" y2="354" stroke="#0f766e" stroke-width="1.6" marker-end="url(#d1)"/>
+    <text class="msg" x="184" y="346">text + history[6]（已脱敏）</text>
+
+    <line x1="480" y1="398" x2="1406" y2="398" stroke="#0f766e" stroke-width="1.6" marker-end="url(#d1)"/>
+    <text class="msg" x="494" y="390">superseded：撤销旧 pending 计划（早于分类）</text>
+
+    <line x1="480" y1="442" x2="786" y2="442" stroke="#0f766e" stroke-width="1.6" marker-end="url(#d1)"/>
+    <text class="msg" x="494" y="434">classifyCampus(text)</text>
+
+    <line x1="800" y1="486" x2="494" y2="486" stroke="#8b8b99" stroke-width="1.4" marker-end="url(#d2)"/>
+    <text class="msg" x="530" y="478">kind ∈ {access, repair, card, notice, forum, lost, qa, unknown}</text>
+
+    <line x1="480" y1="530" x2="484" y2="530" stroke="#8b8b99" stroke-width="1.4"/>
+    <text class="msg" x="500" y="522">正则抽槽：place / item / color / itemId(8位前缀)</text>
+
+    <line x1="480" y1="574" x2="1406" y2="574" stroke="#0f766e" stroke-width="1.6" marker-end="url(#d1)"/>
+    <text class="msg" x="494" y="566">savePlan → status='pending'（唯一索引锁）</text>
+
+    <line x1="480" y1="618" x2="184" y2="618" stroke="#8b8b99" stroke-width="1.4" marker-end="url(#d2)"/>
+    <text class="msg" x="210" y="610">预览文案 pending=true（无副作用）</text>
+
+    <line x1="170" y1="662" x2="466" y2="662" stroke="#0f766e" stroke-width="1.6" marker-end="url(#d1)"/>
+    <text class="msg" x="184" y="654">「确认」</text>
+
+    <line x1="480" y1="706" x2="1406" y2="706" stroke="#0f766e" stroke-width="1.6" marker-end="url(#d1)"/>
+    <text class="msg" x="494" y="698">UPDATE … WHERE status='pending' RETURNING（原子抢占）</text>
+
+    <line x1="1420" y1="750" x2="494" y2="750" stroke="#8b8b99" stroke-width="1.4" marker-end="url(#d2)"/>
+    <text class="msg" x="560" y="742">plan (JSON) · 并发确认仅一方成功</text>
+
+    <line x1="480" y1="794" x2="1096" y2="794" stroke="#0f766e" stroke-width="1.6" marker-end="url(#d1)"/>
+    <text class="msg" x="494" y="786">executeTool(name, args, confirmed=true)</text>
+
+    <line x1="1110" y1="838" x2="1114" y2="838" stroke="#8b8b99" stroke-width="1.4"/>
+    <text class="msg" x="1130" y="830">write ∧ ¬confirmed → throw · 再 inputSchema.parse(args)</text>
+
+    <line x1="1110" y1="882" x2="1721" y2="882" stroke="#0f766e" stroke-width="1.6" marker-end="url(#d1)"/>
+    <text class="msg" x="1124" y="874">execute(parsed, ctx)</text>
+
+    <line x1="480" y1="934" x2="184" y2="934" stroke="#8b8b99" stroke-width="1.4" marker-end="url(#d2)"/>
+    <text class="msg" x="210" y="926">answer + forumPostId → data-forum-post-link</text>
+  </g>
+
+  <text class="foot" x="96" y="1012">写工具不出现在 tools 描述符里 —— 模型即便幻觉也无写权限：这是权限边界，不是代码风格</text>
+  <text class="foot" x="1824" y="1012" text-anchor="end">FIG 04 / 06</text>
+</svg>

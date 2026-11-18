@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Youlin Campus · Tool Plane Architecture (v3.1.0)</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --panel:#ffffff; --ink:#131317; --ink2:#3d3d47; --muted:#71717f;
+    --line:#e2e2e8; --line2:#d3d3dc;
+    --violet:#6d28d9; --violet-bg:#f5f1ff; --violet-line:#ddd0fb;
+    --teal:#0f766e; --teal-bg:#eefbf8; --teal-line:#bfe9e2;
+    --amber:#b45309; --amber-bg:#fff8ea; --amber-line:#f4dcae;
+    --slate:#334155; --slate-bg:#f3f5f8; --slate-line:#d5dce6;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.72;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1340px;margin:0 auto;padding:44px 26px 110px}
+
+  /* ---------- masthead ---------- */
+  .masthead{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:30px 32px;position:relative;overflow:hidden}
+  .masthead:before{content:"";position:absolute;inset:0 0 auto 0;height:3px;
+    background:linear-gradient(90deg,var(--slate),var(--violet) 45%,var(--teal) 78%,var(--amber))}
+  .kicker{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
+  h1{font-size:33px;line-height:1.24;margin:12px 0 6px;letter-spacing:-.5px;font-weight:700}
+  h1 small{display:block;font-size:13px;font-weight:500;color:var(--muted);letter-spacing:0;margin-top:9px;font-family:var(--mono)}
+  .abstract{margin-top:18px;color:var(--ink2);font-size:14px;max-width:100ch}
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;margin-top:22px;overflow:hidden}
+  .metric{background:var(--panel);padding:13px 15px}
+  .metric b{display:block;font-size:23px;font-family:var(--mono);letter-spacing:-1px;line-height:1.2}
+  .metric span{font-size:10.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)}
+  .m-v b{color:var(--violet)} .m-d b{color:var(--teal)} .m-x b{color:var(--amber)} .m-n b{color:var(--slate)}
+
+  .warn{margin-top:16px;font-size:12.5px;color:var(--amber);background:var(--amber-bg);
+    border:1px solid var(--amber-line);border-radius:10px;padding:10px 14px}
+
+  /* ---------- toc ---------- */
+  .toc{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 8px}
+  .toc a{font-family:var(--mono);font-size:11.5px;color:var(--ink2);text-decoration:none;
+    border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 12px;transition:.15s}
+  .toc a:hover{border-color:var(--violet-line);color:var(--violet);background:var(--violet-bg)}
+
+  /* ---------- sections ---------- */
+  section{margin-top:46px}
+  h2{font-size:19px;margin:0 0 4px;letter-spacing:-.2px;display:flex;align-items:baseline;gap:12px}
+  h2 .num{font-family:var(--mono);font-size:11px;color:#fff;background:var(--ink);border-radius:5px;padding:3px 7px;letter-spacing:.06em}
+  h3{font-size:14px;margin:26px 0 8px;color:var(--ink)}
+  .lede{color:var(--ink2);font-size:13.5px;margin:8px 0 16px;max-width:104ch}
+  p{font-size:13.5px;color:var(--ink2)}
+  code{font-family:var(--mono);font-size:.9em;background:#f0f0f4;border:1px solid var(--line);
+    border-radius:4px;padding:.5px 4px;color:#242430;white-space:nowrap}
+  a.inline{color:var(--violet);text-decoration:none;border-bottom:1px dotted var(--violet-line)}
+
+  /* figure */
+  figure{margin:18px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .figbody{overflow-x:auto;padding:16px 16px 6px}
+  figcaption{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding:9px 16px;font-family:var(--mono);letter-spacing:.02em}
+  svg{display:block;max-width:100%;height:auto}
+
+  /* cards */
+  .grid{display:grid;gap:14px;margin-top:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .card h4{margin:0 0 6px;font-size:13px;letter-spacing:.01em;display:flex;gap:8px;align-items:center}
+  .card p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.68}
+  .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    padding:2px 6px;border-radius:4px;border:1px solid;white-space:nowrap}
+  .t-v{color:var(--violet);background:var(--violet-bg);border-color:var(--violet-line)}
+  .t-d{color:var(--teal);background:var(--teal-bg);border-color:var(--teal-line)}
+  .t-a{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-line)}
+  .t-s{color:var(--slate);background:var(--slate-bg);border-color:var(--slate-line)}
+
+  /* table */
+  .tablewrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:auto;margin-top:16px}
+  table{width:100%;border-collapse:collapse;font-size:12px;min-width:1080px}
+  th{position:sticky;top:0;background:#fafafb;text-align:left;font-family:var(--mono);font-size:9.8px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 11px;border-bottom:1px solid var(--line2);white-space:nowrap}
+  td{padding:9px 11px;border-bottom:1px solid #efeff3;vertical-align:top;color:var(--ink2)}
+  tr:last-child td{border-bottom:0}
+  td.tool{font-family:var(--mono);font-size:11.5px;color:var(--ink);white-space:nowrap;font-weight:600}
+  td.idx{font-family:var(--mono);color:#a0a0ae;font-size:10.5px;width:28px}
+  tr:hover td{background:#fbfbfd}
+  .rowsep td{background:#f7f7fa;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);padding:7px 11px}
+
+  /* invariants */
+  ol.inv{list-style:none;counter-reset:inv;padding:0;margin:16px 0 0;display:grid;gap:9px}
+  ol.inv li{counter-increment:inv;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--violet);
+    border-radius:0 10px 10px 0;padding:11px 15px 11px 48px;position:relative;font-size:12.8px;color:var(--ink2)}
+  ol.inv li:before{content:"I" counter(inv);position:absolute;left:14px;top:11px;font-family:var(--mono);
+    font-size:10.5px;color:var(--violet);letter-spacing:.06em}
+  ol.inv li b{color:var(--ink);font-weight:600}
+
+  /* glossary */
+  .gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:16px}
+  .gloss div{background:var(--panel);padding:12px 15px}
+  .gloss dt{font-family:var(--mono);font-size:11.5px;color:var(--ink);font-weight:600}
+  .gloss dd{margin:3px 0 0;font-size:11.8px;color:var(--muted);line-height:1.6}
+
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:18px;font-size:11px;color:var(--muted);
+    font-family:var(--mono);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+  @media print{
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    figure,.card,.tablewrap{break-inside:avoid}
+    .toc{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ================= MASTHEAD ================= -->
+<div class="masthead">
+  <div class="kicker">Youlin Campus · Internal Architecture Dossier · Rev 3.1.0</div>
+  <h1>工具调用双平面架构（Dual-Plane Tool Invocation Architecture）
+    <small>runtime: Next.js App Router · AI SDK v7 · DeepSeek(OpenAI-compatible) · Drizzle/PGlite · Vercel Blob</small>
+  </h1>
+  <p class="abstract">
+    本系统并未采用单一的「模型 → function calling → 工具」直连拓扑。工具能力被切分为两个正交平面：
+    <b>模型平面（Plane M）</b>把 8 个能力项以 JSON Schema 形态注册进 <code>streamText</code> 的 <code>tools</code> 描述符，
+    调用权交给模型的 token 级决策；<b>确定性平面（Plane D）</b>把 11 个能力项完全隐藏在模型视野之外，
+    由规则分类器 + 策略注册表 + 悲观确认闸门组成控制面，按代码路径派发。两个平面的交汇点是一个单点仲裁器
+    （<code>canUseModel</code>），它决定本次请求是「让模型接管」还是「由模板直接落盘」。
+  </p>
+  <div class="metrics">
+    <div class="metric m-n"><b>19</b><span>Capability Descriptors</span></div>
+    <div class="metric m-v"><b>8</b><span>Plane M · 模型发起</span></div>
+    <div class="metric m-d"><b>11</b><span>Plane D · 引擎发起</span></div>
+    <div class="metric m-x"><b>6</b><span>含推理内核</span></div>
+    <div class="metric m-n"><b>13</b><span>纯 IO / 规则</span></div>
+    <div class="metric m-x"><b>2</b><span>控制面单点仲裁</span></div>
+  </div>
+  <div class="warn">
+    阅读警示：本文按分布式系统设计文档口径书写，刻意保留控制面/数据面、能力项、闸门、降级阶梯等高密度术语，
+    并按「先图后证」组织。不做术语降维，不提供白话版摘要。证据链见 §8。
+  </div>
+</div>
+
+<nav class="toc">
+  <a href="#s1">01 · 拓扑总览</a>
+  <a href="#s2">02 · 调用权 × 推理性 四象限</a>
+  <a href="#s3">03 · Plane M 时序</a>
+  <a href="#s4">04 · Plane D 时序</a>
+  <a href="#s5">05 · 确认闸门状态机</a>
+  <a href="#s6">06 · 能力矩阵（19 项）</a>
+  <a href="#s7">07 · 系统不变式</a>
+  <a href="#s8">08 · 证据索引</a>
+  <a href="#s9">09 · 术语表</a>
+</nav>
+
+<!-- ================= 01 TOPOLOGY ================= -->
+<section id="s1">
+  <h2><span class="num">01</span>拓扑总览：七层垂直切片</h2>
+  <p class="lede">
+    请求自左向右穿过准入层与传输层，在仲裁层被撕裂为两条互斥的执行路径；两条路径最终收敛到同一批
+    适配器（Adapter）与同一组外部副作用（Side Effect）。注意 <b>Plane D 位于仲裁层下方且恒定先执行</b>：
+    它不是模型的「工具」，而是模型的「前置守卫 + 兜底执行器」。
+  </p>
+
+  <figure>
+    <div class="figbody">
+      <svg viewBox="0 0 1240 1010" role="img" aria-label="工具调用七层拓扑图">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8b8b99"/>
+          </marker>
+          <marker id="arv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6d28d9"/>
+          </marker>
+          <marker id="ard" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+          </marker>
+          <pattern id="hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="0" y2="7" stroke="#e9e9f0" stroke-width="1"/>
+          </pattern>
+        </defs>
+
+        <!-- ===== L0 ===== -->
+        <text x="40" y="30" font-family="ui-monospace,monospace" font-size="10.5" letter-spacing="2" fill="#71717f">L0 · ADMISSION</text>
+        <g font-family="Inter,system-ui,sans-serif">
+          <rect x="40" y="44" width="220" height="54" rx="8" fill="#f3f5f8" stroke="#d5dce6"/>
+          <text x="56" y="66" font-size="12.5" font-weight="600" fill="#131317">Web Client</text>
+          <text x="56" y="84" font-size="10.5" fill="#71717f" font-family="ui-monospace,monospace">useChat · SSE consumer</text>
+
+          <rect x="280" y="44" width="220" height="54" rx="8" fill="#fff" stroke="#e2e2e8"/>
+          <text x="296" y="66" font-size="12.5" font-weight="600" fill="#131317">BotID</text>
+          <text x="296" y="84" font-size="10.5" fill="#71717f" font-family="ui-monospace,monospace">checkBotId() · isBot</text>
+
+          <rect x="520" y="44" width="220" height="54" rx="8" fill="#fff" stroke="#e2e2e8"/>
+          <text x="536" y="66" font-size="12.5" font-weight="600" fill="#131317">Auth.js</text>
+          <text x="536" y="84" font-size="10.5" fill="#71717f" font-family="ui-monospace,monospace">session · userType</text>
+
+          <rect x="760" y="44" width="220" height="54" rx="8" fill="#fff" stroke="#e2e2e8"/>
+          <text x="776" y="66" font-size="12.5" font-weight="600" fill="#131317">限流器</text>
+          <text x="776" y="84" font-size="10.5" fill="#71717f" font-family="ui-monospace,monospace">IP RPM · Upstash</text>
+
+          <rect x="1000" y="44" width="200" height="54" rx="8" fill="#fff" stroke="#e2e2e8"/>
+          <text x="1016" y="66" font-size="12.5" font-weight="600" fill="#131317">配额判定</text>
+          <text x="1016" y="84" font-size="10.5" fill="#71717f" font-family="ui-monospace,monospace">maxMsg / 1h</text>
+        </g>
+
+        <line x1="150" y1="98" x2="150" y2="132" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#ar)"/>
+        <line x1="1100" y1="98" x2="1100" y2="132" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#ar)"/>
+
+        <!-- ===== L1 ===== -->
+        <text x="40" y="126" font-family="ui-monospace,monospace" font-size="10.5" letter-spacing="2" fill="#71717f">L1 · TRANSPORT</text>
+        <rect x="40" y="136" width="560" height="58" rx="8" fill="#fff" stroke="#e2e2e8"/>
+        <text x="56" y="158" font-size="12.5" font-weight="600" fill="#131317">postRequestBodySchema</text>
+        <text x="56" y="177" font-size="10.5" fill="#71717f" font-family="ui-monospace,monospace">Zod 边界校验 → 失败即 bad_request:api</text>
+
+        <rect x="620" y="136" width="580" height="58" rx="8" fill="#f3f5f8" stroke="#d5dce6"/>
+        <text x="636" y="158" font-size="12.5" font-weight="600" fill="#131317">UIMessageStream (SSE)</text>
+        <text x="636" y="177" font-size="10.5" fill="#71717f" font-family="ui-monospace,monospace">createUIMessageStream → Response · resumable-stream(Redis)</text>
+
+        <line x1="320" y1="194" x2="320" y2="232" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#ar)"/>
+        <line x1="900" y1="194" x2="900" y2="232" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#ar)"/>
+
+        <!-- ===== L2 ARBITRATOR ===== -->
+        <text x="40" y="228" font-family="ui-monospace,monospace" font-size="10.5" letter-spacing="2" fill="#b45309">L2 · ARBITRATION (single point of control)</text>
+        <rect x="40" y="240" width="1160" height="86" rx="10" fill="#fff8ea" stroke="#f4dcae"/>
+        <rect x="40" y="240" width="6" height="86" fill="#b45309"/>
+        <text x="64" y="264" font-size="13" font-weight="700" fill="#7c3f06" font-family="ui-monospace,monospace">PLANE ARBITRATOR · canUseModel</text>
+        <text x="64" y="285" font-size="10.8" fill="#8a5a15" font-family="ui-monospace,monospace">runCampusEngine({ text, history[6], userId, chatId }) → CampusOutcome（恒定先执行，不询问模型）</text>
+        <text x="64" y="303" font-size="10.8" fill="#8a5a15" font-family="ui-monospace,monospace">canUseModel = (kind ∈ {unknown, qa}) ∧ ¬suppressModel ∧ ¬/^(确认|取消)/ ∧ hasModelProvider() ∧ ¬isTestEnvironment</text>
+        <text x="64" y="319" font-size="10.2" fill="#a17a3d" font-family="ui-monospace,monospace">→ false：模板字符串直接写入 text-delta（零模型调用）　→ true：进入 Plane M</text>
+
+        <line x1="310" y1="326" x2="310" y2="360" stroke="#0f766e" stroke-width="1.4" marker-end="url(#ard)"/>
+        <line x1="930" y1="326" x2="930" y2="360" stroke="#6d28d9" stroke-width="1.4" marker-end="url(#arv)"/>
+
+        <!-- ===== L3 PLANE D ===== -->
+        <rect x="40" y="368" width="540" height="372" rx="12" fill="#eefbf8" stroke="#bfe9e2"/>
+        <text x="64" y="394" font-size="12.5" font-weight="700" fill="#0b5d56" font-family="ui-monospace,monospace">PLANE D · 确定性平面</text>
+        <text x="64" y="411" font-size="10.4" fill="#2b7a71" font-family="ui-monospace,monospace">11 能力项 · 不对模型暴露 · 控制面派发</text>
+
+        <g font-family="Inter,system-ui,sans-serif">
+          <rect x="64" y="424" width="492" height="52" rx="7" fill="#fff" stroke="#bfe9e2"/>
+          <text x="78" y="445" font-size="11.8" font-weight="600" fill="#131317">classifyCampus() <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· 8 类意图空间</tspan></text>
+          <text x="78" y="463" font-size="10.2" fill="#71717f">正则优先级短路：access › repair › card › notice › forum › lost › qa › unknown</text>
+
+          <rect x="64" y="488" width="492" height="52" rx="7" fill="#fff" stroke="#bfe9e2"/>
+          <text x="78" y="509" font-size="11.8" font-weight="600" fill="#131317">routeCampus() <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· 指代消解</tspan></text>
+          <text x="78" y="527" font-size="10.2" fill="#71717f">topic continuation：短名词 / 承接词 → 缝合上一条 user 意图</text>
+
+          <rect x="64" y="552" width="492" height="52" rx="7" fill="#fff" stroke="#bfe9e2"/>
+          <text x="78" y="573" font-size="11.8" font-weight="600" fill="#131317">toolPolicy{ read | write } <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· 策略注册表</tspan></text>
+          <text x="78" y="591" font-size="10.2" fill="#71717f">write ∈ {registerLost, closeLost, createRepair, publishForum} → 强制闸门</text>
+
+          <rect x="64" y="616" width="492" height="52" rx="7" fill="#fff" stroke="#bfe9e2"/>
+          <text x="78" y="637" font-size="11.8" font-weight="600" fill="#131317">executeTool() <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· IoC 内核</tspan></text>
+          <text x="78" y="655" font-size="10.2" fill="#71717f">inputSchema.parse(args) → execute(parsed, ctx)（绕过 streamText）</text>
+
+          <rect x="64" y="680" width="492" height="52" rx="7" fill="#fff" stroke="#bfe9e2"/>
+          <text x="78" y="701" font-size="11.8" font-weight="600" fill="#131317">CampusPending <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· 悲观确认闸门</tspan></text>
+          <text x="78" y="719" font-size="10.2" fill="#71717f">plan → pending → executing → done / cancelled / superseded / failed</text>
+        </g>
+        <polygon points="306,478 314,478 310,484" fill="#bfe9e2"/>
+        <polygon points="306,542 314,542 310,548" fill="#bfe9e2"/>
+        <polygon points="306,606 314,606 310,612" fill="#bfe9e2"/>
+        <polygon points="306,670 314,670 310,676" fill="#bfe9e2"/>
+
+        <!-- ===== L3 PLANE M ===== -->
+        <rect x="660" y="368" width="540" height="372" rx="12" fill="#f5f1ff" stroke="#ddd0fb"/>
+        <text x="684" y="394" font-size="12.5" font-weight="700" fill="#4c1d95" font-family="ui-monospace,monospace">PLANE M · 模型平面</text>
+        <text x="684" y="411" font-size="10.4" fill="#6d28d9" font-family="ui-monospace,monospace">8 能力项 · tools 描述符 · 模型持有调用权</text>
+
+        <g font-family="Inter,system-ui,sans-serif">
+          <rect x="684" y="424" width="492" height="52" rx="7" fill="#fff" stroke="#ddd0fb"/>
+          <text x="698" y="445" font-size="11.8" font-weight="600" fill="#131317">streamText(DeepSeek) <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· 首轮</tspan></text>
+          <text x="698" y="463" font-size="10.2" fill="#71717f">system prompt ⊕ redactModelMessageTexts(history) ⊕ tools</text>
+
+          <rect x="684" y="488" width="492" height="52" rx="7" fill="#fff" stroke="#ddd0fb"/>
+          <text x="698" y="509" font-size="11.8" font-weight="600" fill="#131317">tools registry <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· 8 descriptors</tspan></text>
+          <text x="698" y="527" font-size="10.2" fill="#71717f">zod → JSON Schema · name/description/parameters 三元组</text>
+
+          <rect x="684" y="552" width="492" height="52" rx="7" fill="#fff" stroke="#ddd0fb"/>
+          <text x="698" y="573" font-size="11.8" font-weight="600" fill="#131317">执行内核分型 <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· kernel typing</tspan></text>
+          <text x="698" y="591" font-size="10.2" fill="#71717f">生成式算子 3 (doc×3) ⊕ IO 算子 5 (media/news/weather/edit)</text>
+
+          <rect x="684" y="616" width="492" height="52" rx="7" fill="#fff" stroke="#ddd0fb"/>
+          <text x="698" y="637" font-size="11.8" font-weight="600" fill="#131317">multi-step tool loop <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· 回灌</tspan></text>
+          <text x="698" y="655" font-size="10.2" fill="#71717f">tool-result → 下一轮 messages → 直至 finishReason=stop</text>
+
+          <rect x="684" y="680" width="492" height="52" rx="7" fill="#fff" stroke="#ddd0fb"/>
+          <text x="698" y="701" font-size="11.8" font-weight="600" fill="#131317">toUIMessageStream <tspan font-family="ui-monospace,monospace" font-size="10" fill="#71717f">· 合流</tspan></text>
+          <text x="698" y="719" font-size="10.2" fill="#71717f">dataStream.merge(...) → 与 trace / waiting-status 同流</text>
+        </g>
+        <polygon points="926,478 934,478 930,484" fill="#ddd0fb"/>
+        <polygon points="926,542 934,542 930,548" fill="#ddd0fb"/>
+        <polygon points="926,606 934,606 930,612" fill="#ddd0fb"/>
+        <polygon points="926,670 934,670 930,676" fill="#ddd0fb"/>
+
+        <line x1="310" y1="740" x2="310" y2="772" stroke="#0f766e" stroke-width="1.4" marker-end="url(#ard)"/>
+        <line x1="930" y1="740" x2="930" y2="772" stroke="#6d28d9" stroke-width="1.4" marker-end="url(#arv)"/>
+
+        <!-- ===== L4 ADAPTERS ===== -->
+        <text x="40" y="766" font-family="ui-monospace,monospace" font-size="10.5" letter-spacing="2" fill="#71717f">L4 · ADAPTERS</text>
+        <rect x="40" y="776" width="540" height="66" rx="9" fill="#fff" stroke="#bfe9e2"/>
+        <text x="56" y="798" font-size="12" font-weight="600" fill="#0b5d56">Campus Adapter Set (11)</text>
+        <text x="56" y="816" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">forum · lost-found · repairs · notices</text>
+        <text x="56" y="831" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">card-service · access · knowledge(RAG fallback)</text>
+
+        <rect x="660" y="776" width="540" height="66" rx="9" fill="#fff" stroke="#ddd0fb"/>
+        <text x="676" y="798" font-size="12" font-weight="600" fill="#4c1d95">Foreign Adapter Set (8)</text>
+        <text x="676" y="816" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">artifacts/{text,code,sheet} · media/{search,grab}</text>
+        <text x="676" y="831" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">news/people.cn · weather/wttr.in</text>
+
+        <line x1="310" y1="842" x2="310" y2="872" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#ar)"/>
+        <line x1="930" y1="842" x2="930" y2="872" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#ar)"/>
+
+        <!-- ===== L5 ===== -->
+        <text x="40" y="868" font-family="ui-monospace,monospace" font-size="10.5" letter-spacing="2" fill="#71717f">L5 · STATE &amp; EXTERNALITY</text>
+        <g font-family="Inter,system-ui,sans-serif">
+          <rect x="40" y="876" width="290" height="70" rx="9" fill="#f3f5f8" stroke="#d5dce6"/>
+          <text x="56" y="899" font-size="12" font-weight="600" fill="#131317">Postgres / PGlite</text>
+          <text x="56" y="917" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">CampusPending · CampusTrace</text>
+          <text x="56" y="932" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">Document · LostItem · ForumPost</text>
+
+          <rect x="346" y="876" width="234" height="70" rx="9" fill="#f3f5f8" stroke="#d5dce6"/>
+          <text x="362" y="899" font-size="12" font-weight="600" fill="#131317">Vercel Blob</text>
+          <text x="362" y="917" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">grabImage 落盘</text>
+          <text x="362" y="932" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">不可逆副作用</text>
+
+          <rect x="660" y="876" width="250" height="70" rx="9" fill="#f5f1ff" stroke="#ddd0fb"/>
+          <text x="676" y="899" font-size="12" font-weight="600" fill="#4c1d95">DeepSeek API</text>
+          <text x="676" y="917" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">chat/completions</text>
+          <text x="676" y="932" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">embedding(ollama/openai)</text>
+
+          <rect x="926" y="876" width="274" height="70" rx="9" fill="#fff8ea" stroke="#f4dcae"/>
+          <text x="942" y="899" font-size="12" font-weight="600" fill="#7c3f06">外部数据源</text>
+          <text x="942" y="917" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">wttr.in · search.people.cn</text>
+          <text x="942" y="932" font-size="10.2" fill="#71717f" font-family="ui-monospace,monospace">image index providers</text>
+        </g>
+
+        <!-- annotations -->
+        <text x="600" y="470" font-size="9.6" fill="#9a9aa8" font-family="ui-monospace,monospace" transform="rotate(0)">互斥</text>
+        <text x="600" y="500" font-size="9.6" fill="#9a9aa8" font-family="ui-monospace,monospace">执行</text>
+        <line x1="592" y1="452" x2="592" y2="700" stroke="#d8d8e2" stroke-width="1" stroke-dasharray="4 5"/>
+      </svg>
+    </div>
+    <figcaption>FIG 1 — 七层垂直切片：L0 准入 → L1 传输 → L2 仲裁 → L3 双平面 → L4 适配器 → L5 状态与外部性</figcaption>
+  </figure>
+
+  <div class="grid g3">
+    <div class="card"><h4><span class="tag t-a">C1</span>单点仲裁</h4><p>两个平面互斥，裁决权集中在 <code>canUseModel</code> 一个布尔表达式上，无二级路由、无 fallback 回跳。控制流可静态推演。</p></div>
+    <div class="card"><h4><span class="tag t-d">C2</span>平面 D 前置</h4><p>引擎先跑后判。即使最终走模型，Plane D 已完成意图归类与槽位抽取，其 <code>evidence</code> 被用作 RAG 上下文注入。</p></div>
+    <div class="card"><h4><span class="tag t-v">C3</span>同流多源</h4><p>模型 token、工具轨迹（<code>data-campus-trace</code>）、等待态（<code>data-waiting-status</code>）合并进同一 SSE 流，前端按 part 类型做投影。</p></div>
+  </div>
+</section>
+
+<!-- ================= 02 QUADRANT ================= -->
+<section id="s2">
+  <h2><span class="num">02</span>调用权 × 推理性：19 个能力项的正交切分</h2>
+  <p class="lede">
+    「走模型 / 不走模型」不是一维属性，而是两个正交维度的叉积：<b>谁发起调用</b>（模型 token 决策 vs 代码路径），
+    与 <b>执行体内是否含推理</b>（生成式 / 表征式 vs 纯 IO 与规则）。只有承认这一点，才能解释为什么
+    <code>searchForum</code> 不在模型的 <code>tools</code> 里、却仍然调用了 <code>generateText</code>。
+  </p>
+
+  <figure>
+    <div class="figbody">
+      <svg viewBox="0 0 1240 640" role="img" aria-label="调用权与推理性四象限矩阵">
+        <defs>
+          <marker id="ax" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#a0a0ae"/>
+          </marker>
+        </defs>
+        <!-- frame -->
+        <rect x="120" y="90" width="1060" height="470" rx="10" fill="#fff" stroke="#e2e2e8"/>
+        <line x1="650" y1="90" x2="650" y2="560" stroke="#e2e2e8" stroke-width="1"/>
+        <line x1="120" y1="325" x2="1180" y2="325" stroke="#e2e2e8" stroke-width="1"/>
+
+        <!-- axis labels -->
+        <text x="650" y="72" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10.5" letter-spacing="1.6" fill="#71717f">X · 执行内核推理性 →</text>
+        <text x="140" y="330" font-family="ui-monospace,monospace" font-size="10.2" fill="#0f766e">← 纯 IO / 规则 / 查表</text>
+        <text x="1160" y="330" text-anchor="end" font-family="ui-monospace,monospace" font-size="10.2" fill="#b45309">生成式 / 表征式推理 →</text>
+
+        <text x="104" y="150" text-anchor="end" font-family="ui-monospace,monospace" font-size="10.5" fill="#6d28d9">调用权 = 模型</text>
+        <text x="104" y="166" text-anchor="end" font-family="ui-monospace,monospace" font-size="9.8" fill="#9a9aa8">function calling</text>
+        <text x="104" y="470" text-anchor="end" font-family="ui-monospace,monospace" font-size="10.5" fill="#0f766e">调用权 = 引擎</text>
+        <text x="104" y="486" text-anchor="end" font-family="ui-monospace,monospace" font-size="9.8" fill="#9a9aa8">code path dispatch</text>
+
+        <!-- Q1 -->
+        <text x="140" y="118" font-family="ui-monospace,monospace" font-size="10.4" fill="#334155" letter-spacing="1.2">Q1 · MODEL-INVOKED / DETERMINISTIC KERNEL</text>
+        <text x="140" y="134" font-family="ui-monospace,monospace" font-size="9.8" fill="#9a9aa8">5 项 · 模型选时机，算子只做 IO</text>
+        <g font-family="ui-monospace,monospace" font-size="11.2">
+          <rect x="140" y="150" width="212" height="34" rx="6" fill="#f3f5f8" stroke="#d5dce6"/><text x="152" y="171" fill="#1e293b">searchImages</text>
+          <rect x="366" y="150" width="212" height="34" rx="6" fill="#f3f5f8" stroke="#d5dce6"/><text x="378" y="171" fill="#1e293b">grabImage</text>
+          <rect x="140" y="192" width="212" height="34" rx="6" fill="#f3f5f8" stroke="#d5dce6"/><text x="152" y="213" fill="#1e293b">searchNews</text>
+          <rect x="366" y="192" width="212" height="34" rx="6" fill="#f3f5f8" stroke="#d5dce6"/><text x="378" y="213" fill="#1e293b">getWeather</text>
+          <rect x="140" y="234" width="212" height="34" rx="6" fill="#f3f5f8" stroke="#d5dce6"/><text x="152" y="255" fill="#1e293b">editDocument</text>
+        </g>
+        <text x="140" y="292" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#9a9aa8">参数由模型生成（自由度高），执行结果确定可复现</text>
+
+        <!-- Q2 -->
+        <text x="672" y="118" font-family="ui-monospace,monospace" font-size="10.4" fill="#6d28d9" letter-spacing="1.2">Q2 · MODEL-INVOKED / GENERATIVE KERNEL</text>
+        <text x="672" y="134" font-family="ui-monospace,monospace" font-size="9.8" fill="#a78bfa">3 项 · 工具内部再起一次生成</text>
+        <g font-family="ui-monospace,monospace" font-size="11.2">
+          <rect x="672" y="150" width="240" height="34" rx="6" fill="#f5f1ff" stroke="#ddd0fb"/><text x="684" y="171" fill="#4c1d95">createDocument</text>
+          <rect x="924" y="150" width="240" height="34" rx="6" fill="#f5f1ff" stroke="#ddd0fb"/><text x="936" y="171" fill="#4c1d95">updateDocument</text>
+          <rect x="672" y="192" width="240" height="34" rx="6" fill="#f5f1ff" stroke="#ddd0fb"/><text x="684" y="213" fill="#4c1d95">requestSuggestions</text>
+        </g>
+        <text x="672" y="252" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#9a9aa8">嵌套调用风险：父调用尚未返回，子流已向同一</text>
+        <text x="672" y="268" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#9a9aa8">UIMessageStream 写入增量（data-* transient parts）</text>
+        <text x="672" y="292" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#a78bfa">⟶ 工具即「二次编排器」，是本系统最深的一层自引用</text>
+
+        <!-- Q3 -->
+        <text x="140" y="356" font-family="ui-monospace,monospace" font-size="10.4" fill="#0f766e" letter-spacing="1.2">Q3 · ENGINE-INVOKED / DETERMINISTIC KERNEL</text>
+        <text x="140" y="372" font-family="ui-monospace,monospace" font-size="9.8" fill="#5eaaa1">8 项 · 规则抽槽 + 本地/样本状态</text>
+        <g font-family="ui-monospace,monospace" font-size="11.2">
+          <rect x="140" y="388" width="212" height="34" rx="6" fill="#eefbf8" stroke="#bfe9e2"/><text x="152" y="409" fill="#0b5d56">searchLost</text>
+          <rect x="366" y="388" width="212" height="34" rx="6" fill="#eefbf8" stroke="#bfe9e2"/><text x="378" y="409" fill="#0b5d56">searchNotice</text>
+          <rect x="140" y="430" width="212" height="34" rx="6" fill="#eefbf8" stroke="#bfe9e2"/><text x="152" y="451" fill="#0b5d56">searchRepair</text>
+          <rect x="366" y="430" width="212" height="34" rx="6" fill="#eefbf8" stroke="#bfe9e2"/><text x="378" y="451" fill="#0b5d56">queryAccess</text>
+          <rect x="140" y="472" width="212" height="34" rx="6" fill="#eefbf8" stroke="#bfe9e2"/><text x="152" y="493" fill="#0b5d56">campusCard</text>
+          <rect x="366" y="472" width="212" height="34" rx="6" fill="#eefbf8" stroke="#bfe9e2"/><text x="378" y="493" fill="#0b5d56">registerLost</text>
+          <rect x="140" y="514" width="212" height="34" rx="6" fill="#eefbf8" stroke="#bfe9e2"/><text x="152" y="535" fill="#0b5d56">closeLost</text>
+          <rect x="366" y="514" width="212" height="34" rx="6" fill="#eefbf8" stroke="#bfe9e2"/><text x="378" y="535" fill="#0b5d56">createRepair</text>
+        </g>
+
+        <!-- Q4 -->
+        <text x="672" y="356" font-family="ui-monospace,monospace" font-size="10.4" fill="#b45309" letter-spacing="1.2">Q4 · ENGINE-INVOKED / INFERENCE KERNEL</text>
+        <text x="672" y="372" font-family="ui-monospace,monospace" font-size="9.8" fill="#c98a34">3 项 · 模型只做「算子」，不做「决策」</text>
+        <g font-family="ui-monospace,monospace" font-size="11.2">
+          <rect x="672" y="388" width="240" height="34" rx="6" fill="#fff8ea" stroke="#f4dcae"/><text x="684" y="409" fill="#7c3f06">searchForum</text>
+          <rect x="924" y="388" width="240" height="34" rx="6" fill="#fff8ea" stroke="#f4dcae"/><text x="936" y="409" fill="#7c3f06">publishForum</text>
+          <rect x="672" y="430" width="240" height="34" rx="6" fill="#fff8ea" stroke="#f4dcae"/><text x="684" y="451" fill="#7c3f06">searchCampus</text>
+        </g>
+        <text x="672" y="494" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#9a9aa8">语义重排 / 结构化草稿 / 向量召回 —— 全部包在 try 里，</text>
+        <text x="672" y="510" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#9a9aa8">失败静默降级为关键词或正则，调用权始终在引擎手上</text>
+        <text x="672" y="536" font-family="ui-monospace,monospace" font-size="10" fill="#b45309">⟶ 模型被「降格」为算子，失去了 self-dispatch 能力</text>
+      </svg>
+    </div>
+    <figcaption>FIG 2 — 四象限：调用权（Y）× 推理性（X）；19 项合计 5 + 3 + 8 + 3</figcaption>
+  </figure>
+
+  <div class="grid g2">
+    <div class="card"><h4><span class="tag t-v">判据</span>什么叫「走模型」</h4>
+      <p>工程上可操作的判据只有三条：①是否出现在 <code>streamText({ tools })</code>；②执行体内是否出现 <code>generateText/streamText/embed</code>；③失败时是否有确定性替代路径。<b>只有②才是真正的「走模型」</b>，①只决定「谁按扳机」。</p></div>
+    <div class="card"><h4><span class="tag t-a">陷阱</span>最容易被误判的一项</h4>
+      <p><code>searchCampus</code> 在 Plane D，看起来「不走模型」，但它的 RAG 检索必须先调 <b>embedding 服务</b>（Ollama 或 OpenAI 兼容 <code>/embeddings</code>），并在建索引时批量嵌入 PDF。它是<b>表征式推理</b>，不是生成式推理。</p></div>
+  </div>
+</section>
+
+<!-- ================= 03 PLANE M SEQUENCE ================= -->
+<section id="s3">
+  <h2><span class="num">03</span>Plane M 时序：function calling 的三次越权</h2>
+  <p class="lede">
+    模型平面并非「调用一次工具就结束」。工具执行体在返回 <code>tool-result</code> 之前，可能已经向同一 SSE 流写入了
+    增量文本、创建了数据库记录、甚至发起了第二次模型生成。这三类越权行为（流越权、状态越权、推理越权）构成了
+    Plane M 的真实复杂度。
+  </p>
+
+  <figure>
+    <div class="figbody">
+      <svg viewBox="0 0 1240 600" role="img" aria-label="模型平面时序图">
+        <defs>
+          <marker id="s1a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6d28d9"/>
+          </marker>
+          <marker id="s1b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8b8b99"/>
+          </marker>
+        </defs>
+        <g font-family="Inter,system-ui,sans-serif">
+          <rect x="10" y="26" width="140" height="46" rx="7" fill="#f3f5f8" stroke="#d5dce6"/>
+          <text x="80" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#131317">Client</text>
+          <text x="80" y="63" text-anchor="middle" font-size="9.4" fill="#71717f" font-family="ui-monospace,monospace">useChat</text>
+
+          <rect x="230" y="26" width="140" height="46" rx="7" fill="#fff8ea" stroke="#f4dcae"/>
+          <text x="300" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#7c3f06">Route · Stream</text>
+          <text x="300" y="63" text-anchor="middle" font-size="9.4" fill="#a17a3d" font-family="ui-monospace,monospace">POST /api/chat</text>
+
+          <rect x="450" y="26" width="140" height="46" rx="7" fill="#f5f1ff" stroke="#ddd0fb"/>
+          <text x="520" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#4c1d95">streamText</text>
+          <text x="520" y="63" text-anchor="middle" font-size="9.4" fill="#6d28d9" font-family="ui-monospace,monospace">AI SDK v7</text>
+
+          <rect x="660" y="26" width="140" height="46" rx="7" fill="#f5f1ff" stroke="#ddd0fb"/>
+          <text x="730" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#4c1d95">Tool Registry</text>
+          <text x="730" y="63" text-anchor="middle" font-size="9.4" fill="#6d28d9" font-family="ui-monospace,monospace">8 descriptors</text>
+
+          <rect x="870" y="26" width="140" height="46" rx="7" fill="#eefbf8" stroke="#bfe9e2"/>
+          <text x="940" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0b5d56">Adapter</text>
+          <text x="940" y="63" text-anchor="middle" font-size="9.4" fill="#2b7a71" font-family="ui-monospace,monospace">execute()</text>
+
+          <rect x="1080" y="26" width="140" height="46" rx="7" fill="#fff" stroke="#e2e2e8"/>
+          <text x="1150" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#131317">Model / IO</text>
+          <text x="1150" y="63" text-anchor="middle" font-size="9.4" fill="#71717f" font-family="ui-monospace,monospace">DeepSeek · HTTP · DB</text>
+        </g>
+
+        <g stroke="#d8d8e2" stroke-width="1" stroke-dasharray="4 6">
+          <line x1="80" y1="74" x2="80" y2="580"/>
+          <line x1="300" y1="74" x2="300" y2="580"/>
+          <line x1="520" y1="74" x2="520" y2="580"/>
+          <line x1="730" y1="74" x2="730" y2="580"/>
+          <line x1="940" y1="74" x2="940" y2="580"/>
+          <line x1="1150" y1="74" x2="1150" y2="580"/>
+        </g>
+
+        <g font-family="ui-monospace,monospace" font-size="10.4" fill="#3d3d47">
+          <!-- 1 -->
+          <line x1="80" y1="112" x2="296" y2="112" stroke="#6d28d9" stroke-width="1.3" marker-end="url(#s1a)"/>
+          <text x="92" y="106">POST /api/chat · { id, message, messages[] }</text>
+          <!-- 2 -->
+          <line x1="300" y1="152" x2="516" y2="152" stroke="#6d28d9" stroke-width="1.3" marker-end="url(#s1a)"/>
+          <text x="312" y="146">streamText({ model, system, tools, messages })</text>
+          <!-- 3 -->
+          <line x1="520" y1="192" x2="1146" y2="192" stroke="#6d28d9" stroke-width="1.3" marker-end="url(#s1a)"/>
+          <text x="532" y="186">chat/completions + tools[] (JSON Schema，无执行逻辑)</text>
+          <!-- 4 -->
+          <line x1="1150" y1="232" x2="524" y2="232" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s1b)"/>
+          <text x="960" y="226">tool_calls[ { name, arguments } ]</text>
+          <!-- 5 -->
+          <line x1="520" y1="272" x2="726" y2="272" stroke="#6d28d9" stroke-width="1.3" marker-end="url(#s1a)"/>
+          <text x="532" y="266">resolve(name) → inputSchema 校验 → 未知即抛错</text>
+          <!-- 6 -->
+          <line x1="730" y1="312" x2="936" y2="312" stroke="#6d28d9" stroke-width="1.3" marker-end="url(#s1a)"/>
+          <text x="742" y="306">execute(parsed) · 运行期注入 session / dataStream / modelId</text>
+          <!-- 7 -->
+          <line x1="940" y1="352" x2="1146" y2="352" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s1b)"/>
+          <text x="952" y="346">越权①：写入 data-id / data-kind / data-title (transient)</text>
+          <line x1="940" y1="384" x2="1146" y2="384" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s1b)"/>
+          <text x="952" y="378">越权②：DB 落库 / Blob 落盘</text>
+          <line x1="940" y1="416" x2="1146" y2="416" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s1b)"/>
+          <text x="952" y="410">越权③：generateText / streamText 二次生成</text>
+          <!-- 8 -->
+          <line x1="940" y1="456" x2="734" y2="456" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s1b)"/>
+          <text x="790" y="450">tool-result (JSON)</text>
+          <!-- 9 -->
+          <line x1="730" y1="496" x2="524" y2="496" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s1b)"/>
+          <text x="580" y="490">tool-result part</text>
+          <!-- 10 -->
+          <line x1="520" y1="536" x2="1146" y2="536" stroke="#6d28d9" stroke-width="1.3" marker-end="url(#s1a)"/>
+          <text x="532" y="530">回灌：messages += tool-result → 下一轮（循环至 finishReason=stop）</text>
+          <!-- 11 -->
+          <line x1="520" y1="570" x2="304" y2="570" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s1b)"/>
+          <text x="360" y="564">toUIMessageStream()</text>
+        </g>
+        <line x1="300" y1="570" x2="84" y2="570" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s1b)"/>
+        <text x="112" y="564" font-family="ui-monospace,monospace" font-size="10.4" fill="#3d3d47">SSE: text-delta / data-*</text>
+      </svg>
+    </div>
+    <figcaption>FIG 3 — Plane M：单次 function calling 的完整往返，含三类越权副作用</figcaption>
+  </figure>
+
+  <div class="grid g3">
+    <div class="card"><h4><span class="tag t-v">越权①</span>流越权</h4><p><code>createDocument</code> 在 <code>execute</code> 内直接 <code>dataStream.write()</code>。工具尚未返回，UI 已开始渲染产物骨架 —— 工具对传输层有写权限。</p></div>
+    <div class="card"><h4><span class="tag t-v">越权②</span>状态越权</h4><p><code>requestSuggestions</code> 内部 <code>saveSuggestions()</code>；<code>grabImage</code> 直写 Blob。工具绕过「模型 → 服务层」分层，直接落库。</p></div>
+    <div class="card"><h4><span class="tag t-v">越权③</span>推理越权</h4><p>三个文档类工具内部再起 <code>streamText</code>。一次模型调用衍生出「父决策 + 子生成」两级推理，token 计费与错误归因因此不可线性推算。</p></div>
+  </div>
+</section>
+
+<!-- ================= 04 PLANE D SEQUENCE ================= -->
+<section id="s4">
+  <h2><span class="num">04</span>Plane D 时序：控制面如何绕过模型按扳机</h2>
+  <p class="lede">
+    Plane D 的调用链里没有 <code>streamText</code>。分类器把自然语言压成 8 类离散意图，路由层做指代消解，
+    策略注册表判定读写属性，最后用 <code>inputSchema.parse()</code> 补上 AI SDK 原本提供的参数校验 ——
+    这是一种「手工复刻 function calling、但把决策权收回」的设计，代价是正则覆盖率的长期维护。
+  </p>
+
+  <figure>
+    <div class="figbody">
+      <svg viewBox="0 0 1240 640" role="img" aria-label="确定性平面时序图">
+        <defs>
+          <marker id="s2a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+          </marker>
+          <marker id="s2b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8b8b99"/>
+          </marker>
+        </defs>
+        <g font-family="Inter,system-ui,sans-serif">
+          <rect x="10" y="26" width="132" height="46" rx="7" fill="#f3f5f8" stroke="#d5dce6"/>
+          <text x="76" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#131317">Client</text>
+          <text x="76" y="63" text-anchor="middle" font-size="9.4" fill="#71717f" font-family="ui-monospace,monospace">「确认发布」</text>
+
+          <rect x="206" y="26" width="150" height="46" rx="7" fill="#eefbf8" stroke="#bfe9e2"/>
+          <text x="281" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0b5d56">runCampusEngine</text>
+          <text x="281" y="63" text-anchor="middle" font-size="9.4" fill="#2b7a71" font-family="ui-monospace,monospace">控制面</text>
+
+          <rect x="420" y="26" width="140" height="46" rx="7" fill="#eefbf8" stroke="#bfe9e2"/>
+          <text x="490" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0b5d56">Router</text>
+          <text x="490" y="63" text-anchor="middle" font-size="9.4" fill="#2b7a71" font-family="ui-monospace,monospace">classify/route</text>
+
+          <rect x="624" y="26" width="150" height="46" rx="7" fill="#eefbf8" stroke="#bfe9e2"/>
+          <text x="699" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0b5d56">Policy + IoC</text>
+          <text x="699" y="63" text-anchor="middle" font-size="9.4" fill="#2b7a71" font-family="ui-monospace,monospace">toolPolicy/executeTool</text>
+
+          <rect x="838" y="26" width="150" height="46" rx="7" fill="#fff8ea" stroke="#f4dcae"/>
+          <text x="913" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#7c3f06">CampusPending</text>
+          <text x="913" y="63" text-anchor="middle" font-size="9.4" fill="#a17a3d" font-family="ui-monospace,monospace">确认闸门</text>
+
+          <rect x="1052" y="26" width="150" height="46" rx="7" fill="#eefbf8" stroke="#bfe9e2"/>
+          <text x="1127" y="48" text-anchor="middle" font-size="11.5" font-weight="600" fill="#0b5d56">Adapter · DB</text>
+          <text x="1127" y="63" text-anchor="middle" font-size="9.4" fill="#2b7a71" font-family="ui-monospace,monospace">副作用</text>
+        </g>
+
+        <g stroke="#d8d8e2" stroke-width="1" stroke-dasharray="4 6">
+          <line x1="76" y1="74" x2="76" y2="620"/>
+          <line x1="281" y1="74" x2="281" y2="620"/>
+          <line x1="490" y1="74" x2="490" y2="620"/>
+          <line x1="699" y1="74" x2="699" y2="620"/>
+          <line x1="913" y1="74" x2="913" y2="620"/>
+          <line x1="1127" y1="74" x2="1127" y2="620"/>
+        </g>
+
+        <g font-family="ui-monospace,monospace" font-size="10.3" fill="#3d3d47">
+          <line x1="76" y1="108" x2="277" y2="108" stroke="#0f766e" stroke-width="1.3" marker-end="url(#s2a)"/>
+          <text x="88" y="102">text + history[6]（已脱敏）</text>
+
+          <line x1="281" y1="144" x2="909" y2="144" stroke="#0f766e" stroke-width="1.3" marker-end="url(#s2a)"/>
+          <text x="293" y="138">UPDATE CampusPending SET status='superseded'（撤销陈旧计划）</text>
+
+          <line x1="281" y1="180" x2="486" y2="180" stroke="#0f766e" stroke-width="1.3" marker-end="url(#s2a)"/>
+          <text x="293" y="174">classifyCampus(text)</text>
+
+          <line x1="490" y1="216" x2="285" y2="216" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s2b)"/>
+          <text x="330" y="210">kind ∈ {access,repair,card,notice,forum,lost,qa,unknown}</text>
+
+          <line x1="281" y1="252" x2="285" y2="252" stroke="#8b8b99" stroke-width="1.2"/>
+          <text x="296" y="246">正则抽槽：place / item / color / itemId(8 位前缀)</text>
+
+          <line x1="281" y1="288" x2="909" y2="288" stroke="#0f766e" stroke-width="1.3" marker-end="url(#s2a)"/>
+          <text x="293" y="282">savePlan(plan) → status='pending'</text>
+
+          <line x1="281" y1="324" x2="80" y2="324" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s2b)"/>
+          <text x="112" y="318">预览文案（pending=true，无副作用）</text>
+
+          <line x1="76" y1="360" x2="277" y2="360" stroke="#0f766e" stroke-width="1.3" marker-end="url(#s2a)"/>
+          <text x="88" y="354">「确认」</text>
+
+          <line x1="281" y1="396" x2="909" y2="396" stroke="#0f766e" stroke-width="1.3" marker-end="url(#s2a)"/>
+          <text x="293" y="390">UPDATE … WHERE id=(SELECT … LIMIT 1) AND status='pending' RETURNING</text>
+
+          <line x1="913" y1="432" x2="285" y2="432" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s2b)"/>
+          <text x="470" y="426">plan (JSON) · 原子抢占：并发确认仅一方成功</text>
+
+          <line x1="281" y1="468" x2="695" y2="468" stroke="#0f766e" stroke-width="1.3" marker-end="url(#s2a)"/>
+          <text x="293" y="462">executeTool(name, args, confirmed=true)</text>
+
+          <line x1="699" y1="504" x2="703" y2="504" stroke="#8b8b99" stroke-width="1.2"/>
+          <text x="714" y="498">toolPolicy[name]==='write' ∧ ¬confirmed → throw</text>
+
+          <line x1="699" y1="540" x2="1123" y2="540" stroke="#0f766e" stroke-width="1.3" marker-end="url(#s2a)"/>
+          <text x="711" y="534">inputSchema.parse(args) → execute(parsed, ctx)</text>
+
+          <line x1="1127" y1="576" x2="1127" y2="576" stroke="#8b8b99" stroke-width="1.2"/>
+          <text x="960" y="570">INSERT ForumPost / LostItem · UPDATE status='done'</text>
+
+          <line x1="281" y1="612" x2="80" y2="612" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#s2b)"/>
+          <text x="112" y="606">outcome.answer + forumPostId → data-forum-post-link</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>FIG 4 — Plane D：规则路由 + 悲观确认闸门 + 原子抢占的写路径全链路</figcaption>
+  </figure>
+</section>
+
+<!-- ================= 05 STATE MACHINE ================= -->
+<section id="s5">
+  <h2><span class="num">05</span>确认闸门：14 个状态迁移中的 4 条死路</h2>
+  <p class="lede">
+    <code>CampusPending</code> 是本系统唯一带「人类在环（HITL）」语义的表。它用一张表 + 一个部分唯一索引
+    （<code>WHERE status='pending'</code>）表达「同一会话同一用户至多一个待确认计划」，从而把并发确认、
+    陈旧计划、重复执行三类故障压缩到数据库约束层面解决。
+  </p>
+
+  <figure>
+    <div class="figbody">
+      <svg viewBox="0 0 1240 330" role="img" aria-label="CampusPending 状态机">
+        <defs>
+          <marker id="st" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8b8b99"/>
+          </marker>
+          <marker id="stg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+          </marker>
+        </defs>
+        <g font-family="Inter,system-ui,sans-serif">
+          <!-- initial -->
+          <circle cx="60" cy="170" r="6" fill="#131317"/>
+          <line x1="66" y1="170" x2="136" y2="170" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#st)"/>
+          <text x="70" y="160" font-family="ui-monospace,monospace" font-size="9.8" fill="#71717f">savePlan()</text>
+
+          <!-- pending -->
+          <rect x="140" y="138" width="176" height="64" rx="9" fill="#fff8ea" stroke="#f4dcae"/>
+          <text x="228" y="164" text-anchor="middle" font-size="12" font-weight="700" fill="#7c3f06" font-family="ui-monospace,monospace">pending</text>
+          <text x="228" y="182" text-anchor="middle" font-size="9.6" fill="#a17a3d" font-family="ui-monospace,monospace">唯一索引锁 · TTL 30min</text>
+
+          <!-- cancelled -->
+          <rect x="420" y="30" width="176" height="56" rx="9" fill="#fff" stroke="#e2e2e8"/>
+          <text x="508" y="54" text-anchor="middle" font-size="11.6" font-weight="600" fill="#131317" font-family="ui-monospace,monospace">cancelled</text>
+          <text x="508" y="71" text-anchor="middle" font-size="9.4" fill="#71717f" font-family="ui-monospace,monospace">用户拒绝</text>
+
+          <!-- superseded -->
+          <rect x="420" y="220" width="176" height="56" rx="9" fill="#fff" stroke="#e2e2e8"/>
+          <text x="508" y="244" text-anchor="middle" font-size="11.6" font-weight="600" fill="#131317" font-family="ui-monospace,monospace">superseded</text>
+          <text x="508" y="261" text-anchor="middle" font-size="9.4" fill="#71717f" font-family="ui-monospace,monospace">新消息覆盖</text>
+
+          <!-- executing -->
+          <rect x="680" y="138" width="176" height="64" rx="9" fill="#eefbf8" stroke="#bfe9e2"/>
+          <text x="768" y="164" text-anchor="middle" font-size="12" font-weight="700" fill="#0b5d56" font-family="ui-monospace,monospace">executing</text>
+          <text x="768" y="182" text-anchor="middle" font-size="9.6" fill="#2b7a71" font-family="ui-monospace,monospace">UPDATE…RETURNING</text>
+
+          <!-- done -->
+          <rect x="960" y="138" width="150" height="64" rx="9" fill="#eefbf8" stroke="#bfe9e2"/>
+          <text x="1035" y="164" text-anchor="middle" font-size="12" font-weight="700" fill="#0b5d56" font-family="ui-monospace,monospace">done</text>
+          <text x="1035" y="182" text-anchor="middle" font-size="9.6" fill="#2b7a71" font-family="ui-monospace,monospace">副作用已生效</text>
+
+          <!-- failed -->
+          <rect x="680" y="232" width="176" height="56" rx="9" fill="#fff" stroke="#f0c9c9"/>
+          <text x="768" y="256" text-anchor="middle" font-size="11.6" font-weight="600" fill="#8f1d1d" font-family="ui-monospace,monospace">failed</text>
+          <text x="768" y="273" text-anchor="middle" font-size="9.4" fill="#a15a5a" font-family="ui-monospace,monospace">execute 抛错</text>
+        </g>
+
+        <line x1="316" y1="158" x2="416" y2="62" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#st)"/>
+        <text x="330" y="100" font-family="ui-monospace,monospace" font-size="9.4" fill="#71717f">取消</text>
+        <line x1="316" y1="180" x2="676" y2="180" stroke="#0f766e" stroke-width="1.6" marker-end="url(#stg)"/>
+        <text x="430" y="170" font-family="ui-monospace,monospace" font-size="9.4" fill="#0b5d56">确认 · approve=true 原子抢占</text>
+        <line x1="316" y1="198" x2="416" y2="240" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#st)"/>
+        <text x="324" y="236" font-family="ui-monospace,monospace" font-size="9.4" fill="#71717f">下一条 message</text>
+        <line x1="856" y1="176" x2="956" y2="176" stroke="#0f766e" stroke-width="1.6" marker-end="url(#stg)"/>
+        <line x1="768" y1="202" x2="768" y2="228" stroke="#8b8b99" stroke-width="1.2" marker-end="url(#st)"/>
+        <text x="778" y="220" font-family="ui-monospace,monospace" font-size="9.4" fill="#71717f">catch</text>
+        <text x="960" y="240" font-family="ui-monospace,monospace" font-size="9.2" fill="#9a9aa8">终态：done / cancelled</text>
+        <text x="960" y="254" font-family="ui-monospace,monospace" font-size="9.2" fill="#9a9aa8">非终态：pending / executing</text>
+        <text x="960" y="268" font-family="ui-monospace,monospace" font-size="9.2" fill="#9a9aa8">死路：superseded / failed</text>
+      </svg>
+    </div>
+    <figcaption>FIG 5 — CampusPending 状态机：pending → executing 为唯一合法推进边，其余为终态或死路</figcaption>
+  </figure>
+
+  <div class="grid g2">
+    <div class="card"><h4><span class="tag t-a">并发</span>为什么必须是单条 UPDATE</h4>
+      <p>「先 SELECT 再 UPDATE」在双标签页同时点确认时会双重执行。<code>UPDATE … WHERE status='pending' RETURNING</code> 把悲观锁语义压进一条语句，第二个请求命中 0 行 → 返回「当前没有待确认的操作」。</p></div>
+    <div class="card"><h4><span class="tag t-a">陈旧</span>为什么要 superseded</h4>
+      <p>用户连发两条不同意图时，旧计划若不撤销，晚到的「确认」会执行与当前语境无关的写操作。因此每条新消息前置一条 <code>superseded</code> 更新，早于分类。</p></div>
+  </div>
+</section>
+
+<!-- ================= 06 MATRIX ================= -->
+<section id="s6">
+  <h2><span class="num">06</span>能力矩阵：19 个能力项全字段</h2>
+  <p class="lede">
+    下表按「平面 → 能力项」排序，列出调用权归属、执行内核类型、模型依赖强度、副作用类别与失败降级策略。
+    「模型依赖」一列标注为「无」者，即便全站模型不可用也能完整工作。
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <colgroup>
+        <col style="width:34px"><col style="width:176px"><col style="width:52px"><col style="width:82px">
+        <col style="width:196px"><col style="width:104px"><col style="width:196px"><col style="width:230px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>#</th><th>能力项 / tool</th><th>平面</th><th>调用权</th><th>执行内核</th><th>模型依赖</th><th>副作用</th><th>失败降级</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="rowsep"><td colspan="8">PLANE M · 注册进 streamText 的 8 个描述符</td></tr>
+        <tr><td class="idx">01</td><td class="tool">createDocument</td><td><span class="tag t-v">M</span></td><td>模型 FC</td><td>生成式 · streamText（三段 handler）</td><td>强（DeepSeek）</td><td>Document 落库 + 流式写 data-*</td><td>onError → 流内错误文案</td></tr>
+        <tr><td class="idx">02</td><td class="tool">updateDocument</td><td><span class="tag t-v">M</span></td><td>模型 FC</td><td>生成式 · streamText 全文改写</td><td>强</td><td>覆盖 Document.content</td><td>同上</td></tr>
+        <tr><td class="idx">03</td><td class="tool">requestSuggestions</td><td><span class="tag t-v">M</span></td><td>模型 FC</td><td>生成式 · Output.array 结构化流</td><td>强</td><td>Suggestion 批量落库 + transient part</td><td>空数组（无建议）</td></tr>
+        <tr><td class="idx">04</td><td class="tool">editDocument</td><td><span class="tag t-v">M</span></td><td>模型 FC</td><td>纯字符串精确替换</td><td>无</td><td>Document.content 局部替换</td><td>返回 <code>{error}</code>，不抛</td></tr>
+        <tr><td class="idx">05</td><td class="tool">searchImages</td><td><span class="tag t-v">M</span></td><td>模型 FC</td><td>HTTP 多源聚合 + 去重</td><td>无</td><td>无（只读外网）</td><td><code>{found:false,error}</code></td></tr>
+        <tr><td class="idx">06</td><td class="tool">grabImage</td><td><span class="tag t-v">M</span></td><td>模型 FC</td><td>HTTP 下载 + Blob put</td><td>无</td><td><b>不可逆</b>：新增 Blob 对象</td><td><code>{ok:false,error}</code></td></tr>
+        <tr><td class="idx">07</td><td class="tool">searchNews</td><td><span class="tag t-v">M</span></td><td>模型 FC</td><td>HTTP(people.cn) + 转载合并</td><td>无</td><td>无</td><td>note 文案 / <code>{found:false}</code></td></tr>
+        <tr><td class="idx">08</td><td class="tool">getWeather</td><td><span class="tag t-v">M</span></td><td>模型 FC</td><td>HTTP(wttr.in) + 字段裁剪</td><td>无</td><td>无</td><td><code>{found:false,error}</code></td></tr>
+
+        <tr class="rowsep"><td colspan="8">PLANE D · 仅由引擎派发的 11 个能力项</td></tr>
+        <tr><td class="idx">09</td><td class="tool">searchCampus</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>混合：embedding 召回 ⊕ IDF 关键词重排</td><td>表征式（可缺省）</td><td>无</td><td>RAG 异常 → 内置 campusArticles</td></tr>
+        <tr><td class="idx">10</td><td class="tool">searchForum</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>混合：LLM 语义重排 ⊕ 关键词</td><td>生成式（可降级）</td><td>无</td><td>回退 <code>searchForumPosts()</code></td></tr>
+        <tr><td class="idx">11</td><td class="tool">publishForum</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>混合：LLM 结构化草稿 ⊕ 正则抽槽</td><td>生成式（可降级）</td><td><b>写</b> ForumPost（经闸门）</td><td>回退 <code>forumCategory()</code></td></tr>
+        <tr><td class="idx">12</td><td class="tool">registerLost</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>规则抽槽 + DB 写入 + 互补匹配</td><td>无</td><td><b>写</b> LostItem（经闸门）</td><td>缺类别 → 要求补充</td></tr>
+        <tr><td class="idx">13</td><td class="tool">closeLost</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>DB 条件更新（ownership 校验）</td><td>无</td><td><b>写</b> 状态迁移</td><td><code>{closed:false}</code></td></tr>
+        <tr><td class="idx">14</td><td class="tool">createRepair</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>正则校验 + 内存台账追加</td><td>无</td><td><b>写</b> 工单</td><td>缺房间/项目 → 提示格式</td></tr>
+        <tr><td class="idx">15</td><td class="tool">searchLost</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>文本包含匹配</td><td>无</td><td>无</td><td><code>found:false</code></td></tr>
+        <tr><td class="idx">16</td><td class="tool">searchNotice</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>关键词命中（样本通知）</td><td>无</td><td>无</td><td><code>found:false</code></td></tr>
+        <tr><td class="idx">17</td><td class="tool">searchRepair</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>关键词命中（工单号/房间/项目）</td><td>无</td><td>无</td><td><code>found:false</code></td></tr>
+        <tr><td class="idx">18</td><td class="tool">queryAccess</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>字典查表（地点 → 开放时间）</td><td>无</td><td>无</td><td><code>found:false</code></td></tr>
+        <tr><td class="idx">19</td><td class="tool">campusCard</td><td><span class="tag t-d">D</span></td><td>引擎</td><td>常量样本（loss/replace/balance）</td><td>无</td><td>无</td><td>—（无外部依赖）</td></tr>
+
+        <tr class="rowsep"><td colspan="8">非 TOOL 形态的模型调用（不计入 19 项，但同属模型平面）</td></tr>
+        <tr><td class="idx">A</td><td class="tool">generateTitleFromUserMessage</td><td><span class="tag t-v">M</span></td><td>服务端</td><td>生成式 · generateText（title model）</td><td>强</td><td>updateChatTitleById</td><td>catch 后静默，不影响回答</td></tr>
+        <tr><td class="idx">B</td><td class="tool">pet chat</td><td><span class="tag t-v">M</span></td><td>独立路由</td><td>生成式 · generateText（≤200 tok）</td><td>强</td><td>无（不进会话库、不计配额）</td><td>本地萌系文案池随机</td></tr>
+        <tr><td class="idx">C</td><td class="tool">qa synthesis</td><td><span class="tag t-v">M</span></td><td>仲裁后</td><td>生成式 · streamText（RAG 上下文注入）</td><td>强</td><td>无</td><td>降级为 evidence 原文直出</td></tr>
+        <tr><td class="idx">D</td><td class="tool">createEmbeddingProvider</td><td><span class="tag t-d">D</span></td><td>检索前置</td><td>表征式 · /embeddings + 维度探针</td><td>外部服务</td><td>无</td><td>抛错 → RAG 跳过</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= 07 INVARIANTS ================= -->
+<section id="s7">
+  <h2><span class="num">07</span>系统不变式：11 条不可违反的约束</h2>
+  <p class="lede">以下约束在代码里以断言、类型、SQL 条件、正则或布尔短路的形式存在。破坏任意一条，架构即退化为「一堆能跑的函数」。</p>
+  <ol class="inv">
+    <li><b>写操作必须二次确认</b>：<code>toolPolicy[name] === "write"</code> 且 <code>confirmed !== true</code> 时，<code>executeTool</code> 直接抛错，不存在绕过分支。</li>
+    <li><b>Schema 先行</b>：Plane D 手工调用 <code>inputSchema.parse()</code>，等价复刻 AI SDK 在 Plane M 上的参数校验；未校验的参数不得进入适配器。</li>
+    <li><b>单点裁决</b>：<code>canUseModel</code> 为假时不创建 <code>streamText</code>，回答由模板字符串逐段写入 <code>text-delta</code>。没有「先试模型再回退」的回跳路径。</li>
+    <li><b>确认原子性</b>：抢占靠单条 <code>UPDATE … RETURNING</code>，非法状态迁移在 SQL 层被拒绝（0 行命中即视为无待确认操作）。</li>
+    <li><b>计划时效性</b>：pending 计划超过 30 分钟即不可见（<code>createdAt &gt; now() - interval '30 minutes'</code>），避免隔夜误触。</li>
+    <li><b>计划互斥</b>：部分唯一索引 <code>ON (chatId, userId) WHERE status='pending'</code> 保证同一会话同一用户至多一个待确认计划。</li>
+    <li><b>隐私双向前置</b>：写入模型上下文前 <code>redactModelMessageTexts()</code>；写入论坛正文前 <code>redactPublicText()</code>。命中联系方式且 kind=unknown 时置 <code>suppressModel</code>，直接阻断模型接管。</li>
+    <li><b>降级单调</b>：<code>hasModelProvider()</code> 为假时，模型能力逐级降为规则 / 模板 / 样本数据；功能集合不减，仅质量下降。</li>
+    <li><b>遥测与控制流解耦</b>：<code>report(step)</code> 只写 transient data part，绝不参与分支判断；轨迹缺失不影响业务正确性。</li>
+    <li><b>模型不得自称执行</b>：system prompt 显式禁止「声称执行了未调用的操作」，因为 Plane M 的工具集不含任何校园写能力。</li>
+    <li><b>写工具不出现在 tools 描述符里</b>：<code>campusTools()</code> 的 11 项从不进入 <code>streamText({ tools })</code>。模型即便产生幻觉也无写权限 —— 这是权限边界，不是代码风格。</li>
+  </ol>
+</section>
+
+<!-- ================= 08 EVIDENCE ================= -->
+<section id="s8">
+  <h2><span class="num">08</span>证据索引：每条论断的代码锚点</h2>
+  <div class="tablewrap">
+    <table style="min-width:900px">
+      <colgroup><col style="width:300px"><col style="width:300px"><col></colgroup>
+      <thead><tr><th>论断</th><th>文件 · 位置</th><th>可核验片段</th></tr></thead>
+      <tbody>
+        <tr><td>Plane D 共 11 项，含读写策略表</td><td><code>lib/campus/engine.ts:43-55</code></td><td><code>toolPolicy: Record&lt;ToolName,"read"|"write"&gt;</code></td></tr>
+        <tr><td>Plane M 注册 8 个描述符</td><td><code>app/(chat)/api/chat/route.ts:459-479</code></td><td><code>tools: { ...imageTools(), ...newsTools(), ...weatherTools(), createDocument, editDocument, requestSuggestions, updateDocument }</code></td></tr>
+        <tr><td>仲裁布尔表达式</td><td><code>route.ts:376-381</code></td><td><code>canUseModel = (kind==="unknown"||isKnowledgeAnswer) &amp;&amp; !suppressModel &amp;&amp; ...</code></td></tr>
+        <tr><td>写操作闸门</td><td><code>engine.ts:269-271</code></td><td><code>if (toolPolicy[name] === "write" &amp;&amp; !confirmed) throw</code></td></tr>
+        <tr><td>手工 schema 校验</td><td><code>engine.ts:272-284</code></td><td><code>selected.inputSchema.parse(args)</code> → <code>selected.execute(parsed, …)</code></td></tr>
+        <tr><td>原子抢占 UPDATE</td><td><code>engine.ts:335-338</code></td><td><code>UPDATE "CampusPending" … RETURNING "id","plan"</code></td></tr>
+        <tr><td>部分唯一索引</td><td><code>engine.ts:292-294</code></td><td><code>CREATE UNIQUE INDEX … WHERE "status" = 'pending'</code></td></tr>
+        <tr><td>LLM 语义重排</td><td><code>lib/campus/forum-match.ts:46-56</code></td><td><code>generateText({ model: getLanguageModel("forum-match") … })</code></td></tr>
+        <tr><td>LLM 结构化草稿</td><td><code>lib/campus/forum-draft.ts:64-81</code></td><td><code>generateText({ model: getLanguageModel("forum-draft") … })</code></td></tr>
+        <tr><td>RAG 混合打分</td><td><code>lib/rag/search.ts:120</code></td><td><code>score = vectorScore * 0.45 + snippetScore * 0.55</code></td></tr>
+        <tr><td>embedding 维度探针</td><td><code>lib/rag/embeddings.ts:76-88</code></td><td><code>probe = await embed(["dim"])</code></td></tr>
+        <tr><td>文档工具二次生成</td><td><code>artifacts/text/server.ts:11,35</code></td><td><code>streamText({ … smoothStream … })</code></td></tr>
+        <tr><td>工具内直写流</td><td><code>lib/ai/tools/create-document.ts:28-50</code></td><td><code>dataStream.write({ type:"data-id", transient:true … })</code></td></tr>
+        <tr><td>模型降级到本地</td><td><code>lib/ai/providers.ts:28-42</code></td><td><code>hasModelProvider() ? deepseek.chat(...) : localChatModel</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= 09 GLOSSARY ================= -->
+<section id="s9">
+  <h2><span class="num">09</span>术语表</h2>
+  <p class="lede">用于对外沟通时维持术语一致性。若对方追问「这跟普通 function calling 有什么区别」，只需回答：我们把一半的工具从模型视野里摘出去了。</p>
+  <div class="gloss">
+    <div><dt>双平面仲裁 Dual-Plane Arbitration</dt><dd>同一请求存在两条互斥执行路径，由单一布尔表达式裁决，不存在并行或仲裁争议。</dd></div>
+    <div><dt>能力项 Capability Descriptor</dt><dd>一个 <code>tool()</code> 实例，包含 name / description / inputSchema / execute 四元组。</dd></div>
+    <div><dt>控制面 / 数据面</dt><dd>控制面决定「调什么、允不允许调」；数据面负责「实际读写」。Plane D 同时扮演两者。</dd></div>
+    <div><dt>悲观确认闸门 Pessimistic Gate</dt><dd>写操作在执行前必须获得一次显式人类确认，且确认动作本身是原子的、单次有效的。</dd></div>
+    <div><dt>语义重排 Semantic Rerank</dt><dd>用生成式模型对候选集排序或挑选子集，替代向量相似度；失败则退回关键词。</dd></div>
+    <div><dt>表征式推理 Representational Inference</dt><dd>embedding 编码，不生成文本，只产出向量；属于「走模型」但不算「生成式」。</dd></div>
+    <div><dt>投影式遥测 Projected Telemetry</dt><dd>服务端把内部步骤投影为 <code>data-campus-trace</code> 流事件，前端只做渲染，不参与决策。</dd></div>
+    <div><dt>降级阶梯 Degradation Ladder</dt><dd>模型 → 规则 → 模板 → 样本数据 的四级单调下降，每级都有确定的替代实现。</dd></div>
+    <div><dt>意图空间 Intent Space</dt><dd>8 类离散标签：access / repair / card / notice / forum / lost / qa / unknown。</dd></div>
+    <div><dt>反事实抑制 suppressModel</dt><dd>即使 kind=unknown 本可交给模型，也用布尔标记推翻该决策，用于隐私场景。</dd></div>
+    <div><dt>计划态 Plan State</dt><dd>写操作的待执行快照（tool + args + description），序列化存于 CampusPending.plan。</dd></div>
+    <div><dt>越权 Overreach</dt><dd>工具执行体对流、状态或推理层的额外权限，是本架构最主要的复杂来源。</dd></div>
+  </div>
+</section>
+
+<footer>
+  <span>Youlin Campus · Tool Plane Architecture · Rev 3.1.0 · 静态逆向梳理，不含运行时行为</span>
+  <span>19 capabilities / 8 M / 11 D / 6 inference-bearing / 11 invariants</span>
+</footer>
+
+</div>
+</body>
+</html>

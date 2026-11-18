@@ -457,10 +457,14 @@ self.webpackChunk_N_E.push([[90001],{},function(r){window.__req=r}]);
 __req(889);
 var Valley=window.__GE.et();
 var valley=new Valley(document.getElementById('valley'),function(){},function(){window.__VALLEY_READY=true});
+window.__VALLEY=valley;
 // 接收父页面转发的鼠标位置，在 iframe 内合成 pointermove，实现"花随鼠标生长"
 window.addEventListener('message',function(e){
   var d=e&&e.data;
   if(d&&d.type==='valley-pointer'&&typeof d.x==='number'){
     try{window.dispatchEvent(new PointerEvent('pointermove',{clientX:d.x,clientY:d.y}));}catch(err){}
+  }
+  if(d&&d.type==='valley-wheel'&&typeof d.deltaY==='number'){
+    try{document.getElementById('valley').dispatchEvent(new WheelEvent('wheel',{deltaY:d.deltaY,deltaMode:d.deltaMode||0,cancelable:true,bubbles:true}));}catch(err){}
   }
 });

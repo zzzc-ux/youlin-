@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>校园 AI 助手 · 三层对话架构</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1240px; height: 920px; overflow: hidden; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", system-ui, sans-serif;
+    color: #0F172A;
+    background:
+      radial-gradient(760px 420px at 8% -6%, #E3EEFF 0%, rgba(227,238,255,0) 62%),
+      radial-gradient(680px 400px at 96% 8%, #E2F7EA 0%, rgba(226,247,234,0) 60%),
+      radial-gradient(700px 420px at 70% 104%, #E9EDF3 0%, rgba(233,237,243,0) 62%),
+      #FAFBFD;
+    padding: 42px 40px 30px;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, .mono { font-family: "Consolas", "JetBrains Mono", "SFMono-Regular", monospace; }
+
+  /* ---------- header ---------- */
+  .head { display: flex; align-items: flex-start; justify-content: space-between; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11.5px; letter-spacing: .18em; color: #6B7A90; font-weight: 600;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .eyebrow i { width: 22px; height: 2px; background: #94A3B8; display: inline-block; border-radius: 2px; }
+  h1 { font-size: 30px; line-height: 1.25; letter-spacing: -0.01em; font-weight: 800; color: #0B1220; }
+  h1 span { color: #2F6FEB; }
+  .sub { margin-top: 10px; font-size: 13.5px; color: #5B6879; letter-spacing: .01em; }
+  .stamp {
+    margin-top: 4px; text-align: right;
+    font-size: 11px; color: #7A8798; line-height: 1.9; letter-spacing: .02em;
+  }
+  .stamp b { display: block; font-size: 12px; color: #334155; font-weight: 700; letter-spacing: .06em; }
+
+  /* ---------- stage ---------- */
+  .stage { position: relative; width: 1160px; height: 700px; margin-top: 34px; }
+
+  .card {
+    position: absolute; left: 0; width: 830px;
+    border-radius: 16px; padding: 20px 24px 22px;
+    border: 1px solid;
+    box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 10px 24px -18px rgba(15,23,42,.18);
+  }
+  .card::before {
+    content: ""; position: absolute; left: 0; top: 16px; bottom: 16px; width: 4px;
+    border-radius: 0 4px 4px 0;
+  }
+  .c1 { top: 0;    height: 168px; background: linear-gradient(180deg,#F1F7FF,#E4EFFF); border-color: #C2D9F9; }
+  .c1::before { background: #2F6FEB; }
+  .c2 { top: 236px; height: 168px; background: linear-gradient(180deg,#F0FBF4,#E1F6E8); border-color: #B2E3C4; }
+  .c2::before { background: #159A5B; }
+  .c3 { top: 472px; height: 204px; background: linear-gradient(180deg,#F7F8FA,#EDEFF3); border-color: #D6DBE3; }
+  .c3::before { background: #6B7C90; }
+
+  .card-head { display: flex; align-items: center; gap: 12px; }
+  .badge {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    padding: 4px 10px; border-radius: 999px; background: #fff; border: 1px solid;
+  }
+  .c1 .badge { color: #1D4ED8; border-color: #B9D3F7; }
+  .c2 .badge { color: #0F7A47; border-color: #A9DDBD; }
+  .c3 .badge { color: #46586E; border-color: #CFD6E0; }
+  .card-title { font-size: 18px; font-weight: 700; letter-spacing: .01em; color: #0B1220; }
+  .card-note { margin-left: auto; font-size: 11.5px; color: #8492A6; letter-spacing: .02em; }
+
+  .row { display: flex; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: nowrap; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    height: 36px; padding: 0 14px; border-radius: 10px;
+    background: rgba(255,255,255,.92); border: 1px solid rgba(15,23,42,.09);
+    font-size: 13px; color: #26364D; white-space: nowrap;
+    box-shadow: 0 1px 1px rgba(15,23,42,.03);
+  }
+  .chip .k { color: #7A8798; font-size: 12px; }
+  .chip code {
+    font-size: 12.5px; color: #0F3D8C; background: #EEF4FF;
+    padding: 2px 6px; border-radius: 5px; border: 1px solid #DCE7FB;
+  }
+  .c2 .chip code { color: #0C6B41; background: #EAF9F0; border-color: #C9EBD6; }
+  .chip b { font-weight: 700; color: #0B1220; }
+
+  .sub-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+  .sub-label { font-size: 12px; color: #6B7A90; letter-spacing: .04em; }
+  .tool {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 30px; padding: 0 13px; border-radius: 8px;
+    background: #fff; border: 1px solid #D9E0E9;
+    font-size: 12.5px; color: #33465C; font-weight: 600;
+    box-shadow: 0 1px 1px rgba(15,23,42,.03);
+  }
+
+  /* ---------- connectors ---------- */
+  .conn { position: absolute; left: 72px; width: 2px; }
+  .conn-1 { top: 168px; height: 68px; }
+  .conn-2 { top: 404px; height: 68px; }
+  .conn .line { position: absolute; left: 0; top: 0; width: 2px; height: 56px; border-radius: 2px; }
+  .conn-1 .line { background: linear-gradient(180deg,#B7D2F7,#9BD9B6); }
+  .conn-2 .line { background: linear-gradient(180deg,#A9DDBD,#C6CDD8); }
+  .conn .tip {
+    position: absolute; left: -5px; bottom: 0; width: 0; height: 0;
+    border-left: 6px solid transparent; border-right: 6px solid transparent;
+  }
+  .conn-1 .tip { border-top: 9px solid #9BD9B6; }
+  .conn-2 .tip { border-top: 9px solid #C6CDD8; }
+  .conn .lbl {
+    position: absolute; left: 20px; top: 20px;
+    font-size: 12.5px; letter-spacing: .04em; color: #5B6879; white-space: nowrap;
+    background: rgba(255,255,255,.75); padding: 2px 6px; border-radius: 5px;
+  }
+
+  /* ---------- feedback loop ---------- */
+  .loop { position: absolute; inset: 0; pointer-events: none; }
+  .loop-pill {
+    position: absolute; left: 1006px; top: 330px; transform: translate(-50%,-50%);
+    background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 999px;
+    padding: 7px 14px; font-size: 12.5px; color: #475569; white-space: nowrap;
+    box-shadow: 0 4px 12px -6px rgba(15,23,42,.25);
+  }
+  .loop-pill b { color: #1D4ED8; font-weight: 700; }
+
+  /* ---------- footer ---------- */
+  .foot {
+    position: absolute; left: 0; bottom: 0; width: 1160px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11.5px; color: #8A97A8; letter-spacing: .02em;
+  }
+  .foot .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #9BD9B6; margin-right: 7px; vertical-align: 1px; }
+</style>
+</head>
+<body>
+
+  <div class="head">
+    <div>
+      <div class="eyebrow"><i></i>YOULIN · CAMPUS AI</div>
+      <h1>校园 AI 助手 · <span>三层对话架构</span></h1>
+      <div class="sub">Vercel AI SDK 7 流式对话与 Tool Calling 全链路 —— 从对话入口到校园工具的闭环</div>
+    </div>
+    <div class="stamp">
+      <b>ARCHITECTURE</b>
+      Next.js App Router<br />
+      AI SDK 7 · Streamdown
+    </div>
+  </div>
+
+  <div class="stage">
+
+    <!-- Layer 1 -->
+    <div class="card c1">
+      <div class="card-head">
+        <span class="badge">第 1 层</span>
+        <span class="card-title">对话入口</span>
+        <span class="card-note">用户触点 · 左侧会话列表 + 右侧消息流</span>
+      </div>
+      <div class="row">
+        <span class="chip"><span class="k">对话页</span><code>app/(chat)/chat</code></span>
+        <span class="chip"><span class="k">AI SDK 前端</span><code>@ai-sdk/react</code></span>
+        <span class="chip"><span class="k">流式渲染</span><b>Streamdown</b></span>
+      </div>
+    </div>
+
+    <div class="conn conn-1">
+      <div class="line"></div>
+      <div class="tip"></div>
+      <div class="lbl">用户消息</div>
+    </div>
+
+    <!-- Layer 2 -->
+    <div class="card c2">
+      <div class="card-head">
+        <span class="badge">第 2 层</span>
+        <span class="card-title">AI 编排</span>
+        <span class="card-note">推理 · 决定「说什么」与「调什么」</span>
+      </div>
+      <div class="row">
+        <span class="chip"><b>Vercel AI SDK 7</b><span class="k">·</span>流式对话</span>
+        <span class="chip"><b>Tool Calling</b><span class="k">工具调用</span></span>
+        <span class="chip"><b>DeepSeek</b><span class="k">（可选）/ 本地兜底</span></span>
+      </div>
+    </div>
+
+    <div class="conn conn-2">
+      <div class="line"></div>
+      <div class="tip"></div>
+      <div class="lbl">意图与工具参数</div>
+    </div>
+
+    <!-- Layer 3 -->
+    <div class="card c3">
+      <div class="card-head">
+        <span class="badge">第 3 层</span>
+        <span class="card-title">校园引擎与工具</span>
+        <span class="card-note">执行 · 七类校园能力落地</span>
+      </div>
+      <div class="row">
+        <span class="chip"><code>campus</code><span class="k">意图分类 · 多轮上下文</span></span>
+        <span class="chip"><b>结果返回</b><span class="k">结构化为工具结果</span></span>
+      </div>
+      <div class="sub-row">
+        <span class="sub-label">七类校园工具</span>
+        <span class="tool">问答</span>
+        <span class="tool">通知</span>
+        <span class="tool">报修</span>
+        <span class="tool">卡务</span>
+        <span class="tool">门禁</span>
+        <span class="tool">论坛</span>
+        <span class="tool">失物</span>
+      </div>
+    </div>
+
+    <!-- feedback loop -->
+    <svg class="loop" width="1160" height="700" viewBox="0 0 1160 700" fill="none">
+      <path d="M830 574 H986 Q1006 574 1006 554 V104 Q1006 84 986 84 H852"
+            stroke="#94A3B8" stroke-width="1.6" stroke-dasharray="6 5" stroke-linecap="round" />
+      <path d="M861 78 L851 84 L861 90" stroke="#94A3B8" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <div class="loop-pill" style="top:310px"><b>流式响应</b> + 步骤条进度</div>
+
+    <div class="foot">
+      <span><span class="dot"></span>用户消息 → AI 编排 → 校园工具 → 流式回传，一次对话即完成闭环</span>
+      <span class="mono">next.js · ai@7 · streamdown</span>
+    </div>
+  </div>
+
+</body>
+</html>

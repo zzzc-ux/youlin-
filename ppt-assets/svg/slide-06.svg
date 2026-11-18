@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#334155"/><stop offset=".38" stop-color="#6d28d9"/>
+      <stop offset=".72" stop-color="#0f766e"/><stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <style>
+      .m{font-family:Consolas,monospace}
+      .kicker{font-family:"Microsoft YaHei",sans-serif;font-size:17px;font-weight:500;fill:#8a8a97;letter-spacing:4px}
+      .h1{font-family:"Microsoft YaHei",sans-serif;font-size:54px;font-weight:700;fill:#131317;letter-spacing:-1px}
+      .sub{font-family:Consolas,monospace;font-size:19px;fill:#8a8a97}
+      .colh{font-family:Consolas,monospace;font-size:22px;font-weight:700}
+      .row{font-family:Consolas,monospace;font-size:20px;fill:#1f2430}
+      .ker{font-family:"Microsoft YaHei",sans-serif;font-size:16px;fill:#5d5d6b}
+      .hdr{font-family:"Microsoft YaHei",sans-serif;font-size:13px;font-weight:700;fill:#8a8a97;letter-spacing:2px}
+      .foot{font-family:Consolas,monospace;font-size:16px;fill:#9a9aa8}
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="url(#top)"/>
+
+  <text class="kicker" x="96" y="96">CAPABILITY INVENTORY · 19 DESCRIPTORS</text>
+  <text class="h1" x="96" y="158">能力清单：19 项全字段</text>
+  <text class="sub" x="96" y="196">左列 Plane M（8 项）· 右列 Plane D（11 项）· ● = 含推理内核　■W = 写操作（经确认闸门）</text>
+
+  <!-- ===== LEFT: PLANE M ===== -->
+  <rect x="96" y="236" width="840" height="680" rx="14" fill="#f5f1ff" stroke="#ddd0fb"/>
+  <text class="colh" x="126" y="282" fill="#4c1d95">PLANE M · 模型发起（8）</text>
+  <text class="hdr" x="620" y="282">执行内核</text>
+
+  <g>
+    <rect x="126" y="306" width="780" height="60" rx="8" fill="#ffffff" stroke="#e8e0fb"/>
+    <circle cx="150" cy="336" r="5" fill="#6d28d9"/><text class="row" x="166" y="343">createDocument</text>
+    <text class="ker" x="620" y="343">生成式 · 三段 handler</text>
+
+    <rect x="126" y="374" width="780" height="60" rx="8" fill="#ffffff" stroke="#e8e0fb"/>
+    <circle cx="150" cy="404" r="5" fill="#6d28d9"/><text class="row" x="166" y="411">updateDocument</text>
+    <text class="ker" x="620" y="411">生成式 · 全文改写</text>
+
+    <rect x="126" y="442" width="780" height="60" rx="8" fill="#ffffff" stroke="#e8e0fb"/>
+    <circle cx="150" cy="472" r="5" fill="#6d28d9"/><text class="row" x="166" y="479">requestSuggestions</text>
+    <text class="ker" x="620" y="479">生成式 · Output.array</text>
+
+    <rect x="126" y="510" width="780" height="60" rx="8" fill="#ffffff" stroke="#e8e0fb"/>
+    <text class="row" x="166" y="547">editDocument</text>
+    <text class="ker" x="620" y="547">字符串精确替换</text>
+
+    <rect x="126" y="578" width="780" height="60" rx="8" fill="#ffffff" stroke="#e8e0fb"/>
+    <text class="row" x="166" y="615">searchImages</text>
+    <text class="ker" x="620" y="615">HTTP 多源聚合</text>
+
+    <rect x="126" y="646" width="780" height="60" rx="8" fill="#ffffff" stroke="#e8e0fb"/>
+    <text class="row" x="166" y="683">grabImage</text>
+    <text class="ker" x="620" y="683">HTTP + Blob 落盘 ■W</text>
+
+    <rect x="126" y="714" width="780" height="60" rx="8" fill="#ffffff" stroke="#e8e0fb"/>
+    <text class="row" x="166" y="751">searchNews</text>
+    <text class="ker" x="620" y="751">HTTP people.cn + 去重</text>
+
+    <rect x="126" y="782" width="780" height="60" rx="8" fill="#ffffff" stroke="#e8e0fb"/>
+    <text class="row" x="166" y="819">getWeather</text>
+    <text class="ker" x="620" y="819">HTTP wttr.in</text>
+  </g>
+
+  <!-- ===== RIGHT: PLANE D ===== -->
+  <rect x="984" y="236" width="840" height="680" rx="14" fill="#eefbf8" stroke="#bfe9e2"/>
+  <text class="colh" x="1014" y="282" fill="#0b5d56">PLANE D · 引擎发起（11）</text>
+  <text class="hdr" x="1508" y="282">执行内核</text>
+
+  <g>
+    <rect x="1014" y="306" width="780" height="44" rx="8" fill="#fff8ea" stroke="#f4dcae"/>
+    <circle cx="1034" cy="328" r="4" fill="#b45309"/><text class="row" x="1048" y="335">searchCampus</text>
+    <text class="ker" x="1508" y="335">embedding ⊕ IDF 关键词</text>
+
+    <rect x="1014" y="358" width="780" height="44" rx="8" fill="#fff8ea" stroke="#f4dcae"/>
+    <circle cx="1034" cy="380" r="4" fill="#b45309"/><text class="row" x="1048" y="387">searchForum</text>
+    <text class="ker" x="1508" y="387">LLM 重排 ⊕ 关键词</text>
+
+    <rect x="1014" y="410" width="780" height="44" rx="8" fill="#fff8ea" stroke="#f4dcae"/>
+    <circle cx="1034" cy="432" r="4" fill="#b45309"/><text class="row" x="1048" y="439">publishForum</text>
+    <text class="ker" x="1508" y="439">LLM 草稿 ⊕ 正则 ■W</text>
+
+    <rect x="1014" y="462" width="780" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="row" x="1048" y="491">registerLost</text>
+    <text class="ker" x="1508" y="491">规则抽槽 + DB ■W</text>
+
+    <rect x="1014" y="514" width="780" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="row" x="1048" y="543">closeLost</text>
+    <text class="ker" x="1508" y="543">条件更新 ■W</text>
+
+    <rect x="1014" y="566" width="780" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="row" x="1048" y="595">createRepair</text>
+    <text class="ker" x="1508" y="595">正则校验 + 台账 ■W</text>
+
+    <rect x="1014" y="618" width="780" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="row" x="1048" y="647">searchLost</text>
+    <text class="ker" x="1508" y="647">文本包含匹配</text>
+
+    <rect x="1014" y="670" width="780" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="row" x="1048" y="699">searchNotice</text>
+    <text class="ker" x="1508" y="699">关键词（样本通知）</text>
+
+    <rect x="1014" y="722" width="780" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="row" x="1048" y="751">searchRepair</text>
+    <text class="ker" x="1508" y="751">工单号 / 房间 / 项目</text>
+
+    <rect x="1014" y="774" width="780" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="row" x="1048" y="803">queryAccess</text>
+    <text class="ker" x="1508" y="803">字典查表</text>
+
+    <rect x="1014" y="826" width="780" height="44" rx="8" fill="#ffffff" stroke="#bfe9e2"/>
+    <text class="row" x="1048" y="855">campusCard</text>
+    <text class="ker" x="1508" y="855">常量样本</text>
+  </g>
+
+  <!-- bottom strip -->
+  <rect x="96" y="944" width="1728" height="70" rx="12" fill="#fff8ea" stroke="#f4dcae"/>
+  <text class="m" x="126" y="986" font-size="18" fill="#7c3f06">不变式 I11：Plane D 的 11 项从不进入 streamText({ tools }) —— 模型无写权限，是权限边界而非代码风格</text>
+
+  <text class="foot" x="96" y="1046">19 = 8 + 11　·　● 推理内核 6 项　·　■W 写操作 5 项（4 项经 CampusPending 闸门 + grabImage 落 Blob）</text>
+  <text class="foot" x="1824" y="1046" text-anchor="end">FIG 06 / 06</text>
+</svg>
