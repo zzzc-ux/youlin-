@@ -30,7 +30,7 @@ export function classifyCampus(text: string): CampusKind {
   if (/(找|搜|查|看|找一找|搜一下).{0,12}(帖子|贴子|帖)|((帖子|贴子).{0,8}(在哪|哪里有|有没有))/.test(text)) {
     return "forum";
   }
-  if (/(已经找回|找回了|找到了|已归还|已经归还|归还了|已送还|关闭这条|失物关闭)/.test(text)) {
+  if (/(已经找回|找回了|找到了|已找回|寻回|已寻回|已归还|已经归还|归还了|已送还|已领|领走了|关闭这条|失物关闭)/.test(text)) {
     return "lost";
   }
   if (/(我丢了|丢失|不见了|掉了|遗失|捡到|拾到|失物|招领|寻物)/.test(text) || (/(校园卡|一卡通)/.test(text) && /丢了/.test(text))) {

@@ -25,6 +25,7 @@ import { DataStreamHandler } from "./data-stream-handler";
 import { submitEditedMessage } from "./message-editor";
 import { Messages } from "./messages";
 import { MultimodalInput } from "./multimodal-input";
+import { ValleyBackdrop } from "@/components/effects/valley-backdrop";
 
 export function ChatShell() {
   const {
@@ -112,7 +113,9 @@ export function ChatShell() {
 
   return (
     <>
-      <div className="flex h-dvh w-full flex-row overflow-hidden">
+      {/* 花谷动效背景（仅背景层，无任何交互元素） */}
+      <ValleyBackdrop />
+      <div className="valley-stage relative z-10 flex h-dvh w-full flex-row overflow-hidden">
         <div
           className={cn(
             "flex min-w-0 flex-col transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
@@ -125,7 +128,7 @@ export function ChatShell() {
             selectedVisibilityType={visibilityType}
           />
 
-          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background md:rounded-tl-[22px] md:border-t md:border-l md:border-border dark:shadow-[inset_0_1px_0_oklch(1_0_0/0.04)]">
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden md:rounded-tl-[22px] md:border-t md:border-l md:border-border dark:shadow-[inset_0_1px_0_oklch(1_0_0/0.04)]">
             <Messages
               addToolApprovalResponse={addToolApprovalResponse}
               chatId={chatId}

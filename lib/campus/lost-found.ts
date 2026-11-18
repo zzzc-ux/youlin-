@@ -19,8 +19,8 @@ const SEED_OWNER = "00000000-0000-4000-8000-000000000001";
 
 const readyByDb = new WeakMap<object, Promise<void>>();
 
-async function rowsOf(result: unknown): Promise<LostItem[]> {
-  const rows = (result as { rows?: LostItem[] }).rows ?? [];
+async function rowsOf<T = LostItem>(result: unknown): Promise<T[]> {
+  const rows = (result as { rows?: T[] }).rows ?? [];
   return rows;
 }
 
@@ -191,5 +191,69 @@ export async function closeOwnItem(
     WHERE "id" = ${target.id} AND "userId" = ${userId} AND "status" = 'open'
     RETURNING "id", "userId", "kind", "title", "detail", "place", "color", "category", "status", "createdAt"
   `));
-  return updated[0] ?? null;
+  const closedItem = updated[0];
+  if (!closedItem) {
+    return null;
+  }
+  await syncForumPostsOnClose(db, userId, closedItem);
+  return closedItem;
+}
+
+/**
+ * 关闭失物记录后同步论坛关联帖子，避免"对话里说已找回、论坛帖子仍是寻找中"：
+ * 1. 同一物品重复登记：同用户名下「类别+标题」相同的其它开放记录一并关闭，
+ *    这样绑定在这些重复记录上的帖子会自动显示已解决（帖子状态由关联记录派生）。
+ * 2. 帖子正文提及了本记录的八位编号、但关联记录不对（或未关联）时，
+ *    把帖子重新关联到本记录（一条记录只能绑定一个帖子，冲突时跳过）。
+ */
+async function syncForumPostsOnClose(
+  db: Awaited<ReturnType<typeof createDatabase>>,
+  userId: string,
+  closedItem: LostItem
+): Promise<void> {
+  const shortId = closedItem.id.slice(0, 8);
+  try {
+    // 联动 1：归并同一物品的重复登记记录
+    await db.execute(sql`
+      UPDATE "LostItem" SET "status" = 'closed'
+      WHERE "userId" = ${userId} AND "status" = 'open' AND "id" <> ${closedItem.id}
+        AND "category" = ${closedItem.category} AND "title" = ${closedItem.title}
+    `);
+    // 联动 2：正文/标题提及本记录编号、但未绑定到本记录的帖子 → 重新关联
+    const posts = await rowsOf<{ id: string; lostItemId: string | null }>(
+      await db.execute(sql`
+        SELECT "id", "lostItemId" FROM "ForumPost"
+        WHERE "userId" = ${userId}
+          AND ("body" LIKE ${`%${shortId}%`} OR "title" LIKE ${`%${shortId}%`})
+      `)
+    );
+    if (posts.length === 0) {
+      return;
+    }
+    const alreadyBound = posts.some((post) => post.lostItemId === closedItem.id);
+    if (alreadyBound) {
+      return;
+    }
+    const unbound = posts.find((post) => post.lostItemId == null);
+    if (unbound) {
+      await db.execute(sql`
+        UPDATE "ForumPost" SET "lostItemId" = ${closedItem.id}
+        WHERE "id" = ${unbound.id}
+      `);
+    } else {
+      // 所有提及编号的帖子都已绑定其它记录（多为重复登记），关闭未关闭的那条
+      const otherIds = posts
+        .map((post) => post.lostItemId)
+        .filter((id): id is string => Boolean(id) && id !== closedItem.id);
+      if (otherIds.length > 0) {
+        await db.execute(sql`
+          UPDATE "LostItem" SET "status" = 'closed'
+          WHERE "userId" = ${userId} AND "status" = 'open'
+            AND "id" IN ${sql`( ${sql.join(otherIds.map((id) => sql`${id}::uuid`), sql`, `)} )`}
+        `);
+      }
+    }
+  } catch {
+    // 联动失败不影响关闭记录本身（如唯一索引冲突、表尚未创建等）
+  }
 }

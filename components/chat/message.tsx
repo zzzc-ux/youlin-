@@ -487,7 +487,9 @@ const PurePreviewMessage = ({
           </div>
         )}
         {isAssistant ? (
-          <div className="flex min-w-0 flex-1 flex-col gap-2">{content}</div>
+          <div className="flex min-w-0 flex-1 flex-col gap-2 rounded-2xl bg-card p-4 shadow-[0_1px_3px_oklch(0_0_0/0.06)] ring-1 ring-border/60 dark:bg-transparent dark:p-0 dark:ring-0 dark:shadow-none">
+            {content}
+          </div>
         ) : (
           content
         )}
