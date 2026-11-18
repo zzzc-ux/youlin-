@@ -4,6 +4,8 @@ import type { NextConfig } from "next";
 const basePath = process.env.IS_DEMO === "1" ? "/demo" : "";
 
 const nextConfig: NextConfig = {
+  // 允许通过 127.0.0.1 访问时加载 HMR 等 dev 资源（Next 16 默认拦截跨源 dev 请求）
+  allowedDevOrigins: ["127.0.0.1"],
   serverExternalPackages: ["@electric-sql/pglite"],
   ...(basePath
     ? {

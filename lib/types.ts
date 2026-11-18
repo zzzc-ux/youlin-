@@ -6,6 +6,7 @@ import type { createDocument } from "./ai/tools/create-document";
 import type { requestSuggestions } from "./ai/tools/request-suggestions";
 import type { imageTools } from "./ai/tools/search-images";
 import type { newsTools } from "./ai/tools/search-news";
+import type { weatherTools } from "./ai/tools/weather";
 import type { updateDocument } from "./ai/tools/update-document";
 import type { Suggestion } from "./db/schema";
 
@@ -23,6 +24,7 @@ type requestSuggestionsTool = InferUITool<
 >;
 type imageToolSet = ReturnType<typeof imageTools>;
 type newsToolSet = ReturnType<typeof newsTools>;
+type weatherToolSet = ReturnType<typeof weatherTools>;
 
 export type ChatTools = {
   createDocument: createDocumentTool;
@@ -42,6 +44,7 @@ export type ChatTools = {
   searchImages: InferUITool<imageToolSet["searchImages"]>;
   grabImage: InferUITool<imageToolSet["grabImage"]>;
   searchNews: InferUITool<newsToolSet["searchNews"]>;
+  getWeather: InferUITool<weatherToolSet["getWeather"]>;
 };
 
 export type CampusTraceData = {

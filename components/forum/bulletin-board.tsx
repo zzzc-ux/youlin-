@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { bulletinCover } from "@/lib/campus/bulletin-covers";
 import {
   type Bulletin,
   type BulletinCategory,
@@ -21,12 +22,27 @@ const CATEGORY_TONE: Record<BulletinCategory, string> = {
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-/** 封面图统一走站内代理：人民网是 http 且不在 next/image 白名单里 */
-function proxied(url: string): string {
+/**
+ * 封面图地址归一。
+ *
+ * - 站内路径（现在是 AI 生成的配图，放在 public/bulletins/ai）直接交给 <img>，
+ *   demo 模式开了 basePath 时要带上前缀，否则静态文件 404。
+ * - 外部地址统一走站内代理：人民网是 http，且域名不在 next/image 白名单里。
+ */
+function coverSrc(url: string): string {
+  if (url.startsWith("/")) {
+    return `${BASE_PATH}${url}`;
+  }
   return `${BASE_PATH}/api/img-proxy?url=${encodeURIComponent(url)}`;
 }
 
+/** 用路径前缀标记来源，省得给表加字段。AI 配图必须让读者看得出来不是现场照片 */
+function isAiCover(url?: string): boolean {
+  return (url ?? "").startsWith("/bulletins/ai/");
+}
+
 function BulletinCard({ item }: { item: Bulletin }) {
+  const cover = bulletinCover(item);
   const body = (
     <>
       <div className="flex items-baseline gap-1.5 text-[11.5px] leading-[1.35]">
@@ -43,7 +59,7 @@ function BulletinCard({ item }: { item: Bulletin }) {
         </span>
       </div>
 
-      {item.image ? (
+      {cover ? (
         // 有封面就把图铺满卡片当背景，标题压在图上；渐变保证浅色图上字也读得清
         <div className="relative mt-1.5 aspect-[12/5] w-full overflow-hidden rounded-[4px]">
           {/* biome-ignore lint/performance/noImgElement: 封面域名来自实时抓取，只能经站内代理转发 */}
@@ -52,9 +68,14 @@ function BulletinCard({ item }: { item: Bulletin }) {
             className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
             loading="lazy"
             referrerPolicy="no-referrer"
-            src={proxied(item.image)}
+            src={coverSrc(cover)}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+          {isAiCover(cover) ? (
+            <span className="absolute top-1 right-1 rounded-[3px] bg-black/40 px-1 py-[1px] text-[9px] text-white/70 leading-[1.4] backdrop-blur-[2px]">
+              AI 配图
+            </span>
+          ) : null}
           <div className="relative flex h-full flex-col justify-end gap-1 p-2">
             <h3 className="line-clamp-3 text-[13px] font-medium leading-[1.45] text-white/95">
               {item.title}

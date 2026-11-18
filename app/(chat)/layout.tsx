@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { Toaster } from "sonner";
 import { AppSidebar } from "@/components/chat/app-sidebar";
 import { DataStreamProvider } from "@/components/chat/data-stream-provider";
+import { CampusPet } from "@/components/pet/live2d-pet";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppStage } from "@/components/chat/app-stage";
 import { auth } from "../(auth)/auth";
@@ -43,6 +44,7 @@ async function SidebarShell({ children }: { children: React.ReactNode }) {
         <Suspense fallback={<div className="flex h-dvh" />}>
           <AppStage>{children}</AppStage>
         </Suspense>
+        <CampusPet />
       </SidebarInset>
     </SidebarProvider>
   );

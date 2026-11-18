@@ -11,7 +11,11 @@ export type Bulletin = {
   id: string;
   category: BulletinCategory;
   title: string;
-  /** 缺省时自动走无图版式，不留占位框 */
+  /**
+   * 缺省时自动走无图版式，不留占位框。
+   * 站内路径（/bulletins/ai/...）视为本地封面；外部 http 地址走 /api/img-proxy 转发。
+   * 前缀 /bulletins/ai/ 的图是模型生成的配图，卡片上会打「AI 配图」角标。
+   */
   image?: string;
   /** 站内路径或外链；缺省时卡片不可点 */
   href?: string;
@@ -33,6 +37,7 @@ export const seedBulletins: Bulletin[] = [
   {
     category: "思政",
     id: "sz-qingnian-daxuexi-24",
+    image: "/bulletins/ai/sz-qingnian-daxuexi.jpg",
     issue: "第 24 期",
     origin: "seed",
     publishedAt: "2026-11-18 09:20",
@@ -42,6 +47,7 @@ export const seedBulletins: Bulletin[] = [
   {
     category: "思政",
     id: "sz-gailun-beike",
+    image: "/bulletins/ai/sz-gailun-beike.jpg",
     issue: "第 12 期",
     origin: "seed",
     publishedAt: "2026-11-17 15:00",
@@ -51,6 +57,7 @@ export const seedBulletins: Bulletin[] = [
   {
     category: "思政",
     id: "sz-hongqiqu",
+    image: "/bulletins/ai/sz-hongqiqu.jpg",
     issue: "第 11 期",
     origin: "seed",
     publishedAt: "2026-11-10 10:30",
@@ -60,6 +67,7 @@ export const seedBulletins: Bulletin[] = [
   {
     category: "热点",
     id: "rd-lengkongqi",
+    image: "/bulletins/ai/rd-lengkongqi.jpg",
     origin: "seed",
     publishedAt: "2026-11-18 07:40",
     source: "校气象站",
@@ -68,6 +76,7 @@ export const seedBulletins: Bulletin[] = [
   {
     category: "热点",
     id: "rd-jiuye-zhengce",
+    image: "/bulletins/ai/rd-jiuye-zhengce.jpg",
     origin: "seed",
     publishedAt: "2026-11-17 18:20",
     source: "新华社",
@@ -76,6 +85,7 @@ export const seedBulletins: Bulletin[] = [
   {
     category: "热点",
     id: "rd-shiyanshi-anquan",
+    image: "/bulletins/ai/rd-shiyanshi-anquan.jpg",
     origin: "seed",
     publishedAt: "2026-11-16 11:05",
     source: "教育部网站",
@@ -84,6 +94,7 @@ export const seedBulletins: Bulletin[] = [
   {
     category: "快报",
     id: "kb-tushuguan-zuowei",
+    image: "/bulletins/ai/kb-tushuguan-zuowei.jpg",
     origin: "seed",
     publishedAt: "2026-11-18 10:00",
     source: "图书馆",
@@ -92,6 +103,7 @@ export const seedBulletins: Bulletin[] = [
   {
     category: "快报",
     id: "kb-sanshitang-chuangkou",
+    image: "/bulletins/ai/kb-sanshitang.jpg",
     origin: "seed",
     publishedAt: "2026-11-18 08:10",
     source: "后勤处",
@@ -100,6 +112,7 @@ export const seedBulletins: Bulletin[] = [
   {
     category: "快报",
     id: "kb-xiaoyunhui-jieli",
+    image: "/bulletins/ai/kb-xiaoyunhui.jpg",
     origin: "seed",
     publishedAt: "2026-11-17 16:40",
     source: "体育部",

@@ -28,3 +28,10 @@ yarn-error.log*
 next-env.d.ts
 tsconfig.tsbuildinfo
 .workbuddy/
+
+# 临时调试/数据库副本
+_dbcopy*
+_freshdb
+_boardcheck*
+_initdb*
+_dbtry*

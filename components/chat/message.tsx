@@ -22,6 +22,7 @@ import { CampusToolChip } from "./campus-tool-chip";
 import { CampusTrace } from "./campus-trace";
 import { GrabbedImageCard, ImageSearchGrid, type ImageSearchItem } from "./image-search-result";
 import { NewsSearchList, type NewsSearchItem } from "./news-search-result";
+import { WeatherCard, type WeatherCardData } from "./weather-result";
 import { MessageActions } from "./message-actions";
 import { MessageReasoning } from "./message-reasoning";
 import { PreviewAttachment } from "./preview-attachment";
@@ -390,6 +391,56 @@ const PurePreviewMessage = ({
       }
 
       return <ToolRunning key={toolCallId} label="正在搜索新闻" />;
+    }
+
+    if (type === "tool-getWeather") {
+      const { toolCallId, state } = part;
+
+      if (state === "output-available") {
+        const output = part.output as {
+          error?: string;
+          found?: boolean;
+          location?: string;
+          area?: string;
+          current?: {
+            condition: string;
+            feelsLikeC: number;
+            humidity: number;
+            pressure: number;
+            tempC: number;
+            uvIndex?: number;
+            visibilityKm: number;
+            windDir: string;
+            windKmph: number;
+          };
+          forecast?: WeatherCardData["forecast"];
+        };
+
+        if (output?.error) {
+          return (
+            <div
+              className="glass w-fit rounded-xl px-3.5 py-2.5 text-[13px] text-red-600 dark:text-red-300"
+              key={toolCallId}
+            >
+              {output.error}
+            </div>
+          );
+        }
+
+        return (
+          <WeatherCard
+            key={toolCallId}
+            weather={{
+              area: output?.area,
+              current: output?.current,
+              forecast: output?.forecast,
+              location: output?.location,
+            }}
+          />
+        );
+      }
+
+      return <ToolRunning key={toolCallId} label="正在查询天气" />;
     }
 
     return null;
